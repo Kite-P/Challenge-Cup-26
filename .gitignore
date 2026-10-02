@@ -1,0 +1,11 @@
+references/raw/
+data/raw/
+data/private/
+results/
+logs/
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.env
+*.tmp
