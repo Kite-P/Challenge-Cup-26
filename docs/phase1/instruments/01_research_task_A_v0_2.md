@@ -1,6 +1,6 @@
-# Candidate A：研究问题与设计判断任务 v0.2
+# 候选任务 A：研究问题与设计判断任务 v0.2
 
-**DRAFT — NOT APPROVED FOR DISTRIBUTION OR IMPLEMENTATION**
+**草案——未经批准，不得分发或实施。**
 当前门槛：`PILOT_BLOCKED`。本任务未在真人中试测；预计时长是设计估计，不是实测结果。
 
 ## 1. 目的与边界

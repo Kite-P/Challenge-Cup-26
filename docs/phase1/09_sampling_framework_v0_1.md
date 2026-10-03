@@ -1,6 +1,6 @@
 # 抽样框架 v0.1
 
-**CANDIDATE DESIGN — 未获准招募；正式总体与样本量未确定。**
+**候选设计——尚未获准招募；正式总体与样本量未确定。**
 
 ## 总体层级
 
@@ -39,7 +39,7 @@
 | 样本层 | 候选对象与用途 | 参加负担 | 当前状态 |
 |---|---|---:|---|
 | Student Survey Sample | 符合总体定义的财经相关本科生；描述AI协作行为及研究经历 | 约10–15分钟 | `PENDING` |
-| Student Task Subsample | 愿意完成Candidate A者；观察可见任务表现 | 约25–30分钟 | `PENDING` |
+| 任务子样本 | 愿意完成候选任务 A 者；观察可见任务表现 | 约25–30分钟 | `PENDING` |
 | Student Interview Subsample | 愿意接受半结构访谈者；了解具体协作和判断经历 | 约20–30分钟 | `PENDING` |
 | Teacher Interview Sample | 有相关教学/科研指导经验的教师；了解教学观察与支持需求 | 约20–30分钟 | `PENDING` |
 

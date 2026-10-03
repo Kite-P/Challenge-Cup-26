@@ -21,7 +21,7 @@
 
 ## 推荐结构
 
-1. **主术语（可测层）：信息评价。**任务表现分别记录相关性、来源与依据评价、交叉 corroboration、适用性和理由质量。
+1. **主术语（可测层）：信息评价。**任务表现分别记录相关性、来源与依据评价、交叉印证、适用性和理由质量。
 2. **任务层上位描述：研究判断。**用来概括研究问题、信息、方法、解释和结论限制之间的判断，不在未经验证时汇总为一个心理测量总分。
 3. **AI场景描述：AI输出评价。**作为信息评价中的情境，不等于一般AI素养，也不等于对AI的态度或信任。
 4. **方法子维度：方法适配/方法理解。**任务中观察能否说明方法为何适用、关键假设和解释限制。
@@ -45,7 +45,7 @@
 
 - Hahnel, Eichmann & Goldhammer (2020), [EVON: Evaluation of Online Information in University Students](https://doi.org/10.3389/fpsyg.2020.562128)。情境化信息评价测验。
 - Yang, Chen & Tsai (2013), [How university students evaluate online information about a socio-scientific issue](https://scholar.lib.ntnu.edu.tw/en/publications/how-university-students-evaluate-online-information-about-a-socio-2/)。大学生在线信息评价、判断理由及认识论信念。
-- Hämäläinen et al. (2021), [Students' abilities to evaluate the credibility of online texts](https://doi.org/10.1111/jcal.12580)。在线文本来源、目的、证据与 corroboration 的表现评价。
+- Hämäläinen et al. (2021), [Students' abilities to evaluate the credibility of online texts](https://doi.org/10.1111/jcal.12580)。在线文本来源、目的、证据与交叉印证的表现评价。
 - Hornberger, Bewersdorff & Nerdel (2023), [What do university students know about Artificial Intelligence?](https://doi.org/10.1016/j.caeai.2023.100165)。德国高校AI素养客观测验。
 - Han et al. (2025), [Developing a validated assessment of AI literacy for Chinese university students](https://doi.org/10.1080/15391523.2025.2456051)。中国高校情境AI素养问卷。
 - Jin et al. (2025), [GLAT: The generative AI literacy assessment test](https://doi.org/10.1016/j.caeai.2025.100436)。GenAI客观表现测量。

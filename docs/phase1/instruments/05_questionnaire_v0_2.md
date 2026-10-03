@@ -1,4 +1,4 @@
-DRAFT — NOT APPROVED FOR DISTRIBUTION
+草案——未经批准，不得分发。
 
 # 研究型学习中的生成式AI协作行为问卷 v0.2
 
