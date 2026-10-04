@@ -51,3 +51,16 @@
 - Jin et al. (2025), [GLAT: The generative AI literacy assessment test](https://doi.org/10.1016/j.caeai.2025.100436)。GenAI客观表现测量。
 
 以上为聚焦检索中的工具和概念样本，不是完整系统综述；中文术语最终须结合导师意见和任务材料再定。
+# Phase 1C 工作术语补充（候选）
+
+| 中文工作术语 | 相邻英文术语（非一对一等同） | 本项目暂定含义 | 边界 |
+|---|---|---|---|
+| 信息辨识与评估能力 | information evaluation; information discernment; critical evaluation; source evaluation; epistemic judgment | 评估相关性、来源可信性/真实性、主张依据、材料能否支持结论、交叉印证；识别 AI 错误/幻觉、过度推断，并确定优先核查内容 | 非成熟量表名称；不等同全面信息素养或全部批判性思维 |
+| 独立研究决策能力 | research decision-making; independent decision-making; methodological judgment; learner agency | 界定问题、选择/比较方法、评价 AI 建议、采纳/修改/拒绝、判断方法适用条件、识别限制与结论边界，并承担最终决定责任 | 项目工作术语，不代表已验证单一潜变量 |
+| 方法理解 | methodological understanding; research-methods understanding | 说明方法与问题的匹配及其能/不能支持的结论 | 不等于广义科研能力总分 |
+| AI协作方式 | human–AI collaboration; GenAI use practices | AI参与阶段、是否要求理由/来源/备选项、采纳/修订/拒绝及决策权 | 不把频率当协作质量，不构造总量表 |
+| 可观察任务表现 | task performance | 候选任务产物中可见的分项表现 | 不等同稳定能力或真实岗位绩效 |
+
+EVON、AI literacy、GLAT、automation bias、epistemic judgment 等继续作为邻近文献，不与本项目术语强行映射。以上词语不是量表定名或效度主张。
+
+**版本衔接：**本文前半的 Phase 1A 推荐“信息评价/研究判断”保留为历史术语讨论；Phase 1C 根据导师 round 2 更新的候选主术语是“信息辨识与评估能力”“独立研究决策能力”。更新不表示已存在同名成熟量表，原推荐不再作为当前项目表述。
