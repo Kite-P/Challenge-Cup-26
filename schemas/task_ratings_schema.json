@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "模拟短任务评分长表",
+  "type": "object",
+  "required": ["research_id", "rater_id", "dimension", "score", "synthetic_flag"],
+  "properties": {
+    "research_id": {"type": "string", "nullable": false, "description_zh": "任务样本编号", "synthetic_only": true},
+    "rater_id": {"type": "string", "nullable": false, "enum": ["R1", "R2"], "allowed_values": ["R1", "R2"], "description_zh": "模拟评分者编号", "synthetic_only": true},
+    "dimension": {"type": "string", "nullable": false, "description_zh": "六个评分维度之一", "synthetic_only": true},
+    "score": {"type": "integer", "nullable": false, "minimum": 0, "maximum": 2, "description_zh": "分项评分", "synthetic_only": true},
+    "synthetic_flag": {"type": "string", "nullable": false, "enum": ["TRUE"], "allowed_values": ["TRUE"], "description_zh": "模拟记录标志", "synthetic_only": true}
+  }
+}

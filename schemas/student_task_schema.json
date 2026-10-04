@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "模拟短任务结构",
+  "type": "object",
+  "required": ["research_id", "synthetic_flag", "task_completed", "ai_used_in_task", "problem_definition", "information_evaluation", "method_fit", "limitation_boundary", "independent_decision", "reasoning_quality"],
+  "properties": {
+    "research_id": {"type": "string", "nullable": false, "description_zh": "问卷样本内去标识化关联编号", "synthetic_only": true},
+    "synthetic_flag": {"type": "string", "nullable": false, "enum": ["TRUE"], "allowed_values": ["TRUE"], "description_zh": "模拟记录标志", "synthetic_only": true},
+    "task_completed": {"type": "string", "nullable": false, "enum": ["TRUE", "FALSE"], "allowed_values": ["TRUE", "FALSE"], "description_zh": "任务是否完成", "synthetic_only": true},
+    "ai_used_in_task": {"type": "string", "nullable": false, "enum": ["YES", "NO"], "allowed_values": ["YES", "NO"], "description_zh": "本次任务AI使用事实", "synthetic_only": true},
+    "ai_stage": {"type": "string", "nullable": false, "description_zh": "AI使用环节；未使用时跳题", "synthetic_only": true},
+    "asked_reason": {"type": "string", "nullable": false, "description_zh": "追问理由", "synthetic_only": true},
+    "checked_evidence": {"type": "string", "nullable": false, "description_zh": "检查依据", "synthetic_only": true},
+    "modified_ai": {"type": "string", "nullable": false, "description_zh": "是否修改AI建议", "synthetic_only": true},
+    "rejected_ai": {"type": "string", "nullable": false, "description_zh": "是否拒绝AI建议", "synthetic_only": true},
+    "final_decision_owner": {"type": "string", "nullable": false, "description_zh": "最终决策归属自报", "synthetic_only": true},
+    "research_experience_group": {"type": "string", "nullable": false, "description_zh": "研究经历分组", "synthetic_only": true},
+    "problem_definition": {"type": "integer", "nullable": false, "minimum": 0, "maximum": 2, "description_zh": "问题界定分项锚定表现", "synthetic_only": true},
+    "information_evaluation": {"type": "integer", "nullable": false, "minimum": 0, "maximum": 2, "description_zh": "信息辨识与评估分项锚定表现", "synthetic_only": true},
+    "method_fit": {"type": "integer", "nullable": false, "minimum": 0, "maximum": 2, "description_zh": "方法适配分项锚定表现", "synthetic_only": true},
+    "limitation_boundary": {"type": "integer", "nullable": false, "minimum": 0, "maximum": 2, "description_zh": "限制与结论边界分项锚定表现", "synthetic_only": true},
+    "independent_decision": {"type": "integer", "nullable": false, "minimum": 0, "maximum": 2, "description_zh": "独立研究决策分项锚定表现", "synthetic_only": true},
+    "reasoning_quality": {"type": "integer", "nullable": false, "minimum": 0, "maximum": 2, "description_zh": "理由质量分项锚定表现", "synthetic_only": true}
+  }
+}

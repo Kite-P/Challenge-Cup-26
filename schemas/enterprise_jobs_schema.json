@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "模拟岗位记录",
+  "type": "object",
+  "required": ["stable_job_record_key", "synthetic_flag", "job_family", "synthetic_title", "synthetic_description", "year"],
+  "properties": {
+    "stable_job_record_key": {"type": "string", "nullable": false, "description_zh": "模拟稳定岗位记录键；真实组合方式须按未来获准数据确定", "synthetic_only": true},
+    "synthetic_flag": {"type": "string", "nullable": false, "enum": ["TRUE"], "allowed_values": ["TRUE"], "description_zh": "模拟记录标志", "synthetic_only": true},
+    "job_family": {"type": "string", "nullable": false, "description_zh": "模拟岗位族", "synthetic_only": true},
+    "synthetic_title": {"type": "string", "nullable": false, "description_zh": "虚构岗位标题", "synthetic_only": true},
+    "synthetic_description": {"type": "string", "nullable": false, "description_zh": "模板构造的模拟职责，不含真实企业文本", "synthetic_only": true},
+    "year": {"type": "integer", "nullable": false, "description_zh": "模拟年份", "synthetic_only": true},
+    "synthetic_industry": {"type": "string", "nullable": false, "description_zh": "模拟行业类别", "synthetic_only": true},
+    "synthetic_region": {"type": "string", "nullable": false, "description_zh": "模拟地区类别", "synthetic_only": true},
+    "education_requirement": {"type": "string", "nullable": false, "description_zh": "模拟学历要求", "synthetic_only": true},
+    "experience_requirement": {"type": "string", "nullable": false, "description_zh": "模拟经验要求", "synthetic_only": true},
+    "salary_band_synthetic": {"type": "string", "nullable": false, "description_zh": "OPTIONAL模拟薪酬档，不代表真实薪酬", "synthetic_only": true}
+  }
+}

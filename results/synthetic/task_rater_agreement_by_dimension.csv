@@ -1,0 +1,7 @@
+﻿synthetic_flag,dimension,exact_agreement_rate,mean_absolute_difference,disagreement_count
+TRUE,independent_decision,0.875,0.125,10
+TRUE,information_evaluation,0.7625,0.2375,19
+TRUE,limitation_boundary,0.8,0.2,16
+TRUE,method_fit,0.825,0.175,14
+TRUE,problem_definition,0.8625,0.1375,11
+TRUE,reasoning_quality,0.8375,0.1625,13

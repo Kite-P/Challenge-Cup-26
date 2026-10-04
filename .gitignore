@@ -1,7 +1,10 @@
 references/raw/
 data/raw/
 data/private/
-results/
+results/*
+!results/synthetic/
+results/synthetic/*
+!results/synthetic/**
 logs/
 .venv/
 __pycache__/

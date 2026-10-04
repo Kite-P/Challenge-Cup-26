@@ -1,0 +1,9 @@
+﻿synthetic_flag,enterprise_signal,student_survey_signal,student_task_signal,comparability,interpretation_boundary
+TRUE,information_evaluation,候选问卷相关自报或情境题,任务相关分项（模拟）,DIRECT,不同证据来源不可合并为单一数值；本表仅供流程映射。
+TRUE,method_understanding,候选问卷未直接覆盖,任务只能提供部分对应,PARTIAL,不同证据来源不可合并为单一数值；本表仅供流程映射。
+TRUE,independent_judgment,候选问卷相关自报或情境题,任务相关分项（模拟）,DIRECT,不同证据来源不可合并为单一数值；本表仅供流程映射。
+TRUE,data_interpretation,候选问卷未直接覆盖,任务只能提供部分对应,PARTIAL,不同证据来源不可合并为单一数值；本表仅供流程映射。
+TRUE,communication,候选问卷未直接覆盖,任务只能提供部分对应,NO_DIRECT_MATCH,不同证据来源不可合并为单一数值；本表仅供流程映射。
+TRUE,digital_tool_use,候选问卷未直接覆盖,任务只能提供部分对应,NO_DIRECT_MATCH,不同证据来源不可合并为单一数值；本表仅供流程映射。
+TRUE,problem_definition,候选问卷相关自报或情境题,任务相关分项（模拟）,DIRECT,不同证据来源不可合并为单一数值；本表仅供流程映射。
+TRUE,limitation_awareness,候选问卷相关自报或情境题,任务相关分项（模拟）,DIRECT,不同证据来源不可合并为单一数值；本表仅供流程映射。
