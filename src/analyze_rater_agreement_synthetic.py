@@ -7,7 +7,9 @@ from src.synthetic_analysis_common import read, write
 
 def main() -> int:
     ratings = read("task_ratings_synthetic.csv")
+    ratings["score"] = ratings["score"].astype("int64")
     wide = ratings.pivot(index=["research_id", "dimension"], columns="rater_id", values="score").reset_index()
+    wide = wide.dropna(subset=["R1", "R2"])
     wide["exact_agreement"] = wide.R1 == wide.R2
     wide["absolute_difference"] = (wide.R1 - wide.R2).abs()
     summary = wide.groupby("dimension").agg(exact_agreement_rate=("exact_agreement", "mean"), mean_absolute_difference=("absolute_difference", "mean"), disagreement_count=("exact_agreement", lambda value: int((~value).sum()))).reset_index()

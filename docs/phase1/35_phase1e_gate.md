@@ -1,4 +1,6 @@
-# Phase 1E Gate
+# Phase 1E Gate（历史记录）
+
+> 本页记录 Phase 1E 当时的模拟预演结果和待修问题。当前模拟流程结论以 [Phase 1F Gate](40_phase1f_gate.md)、[独立复核记录](39_phase1e独立复核与纠错记录.md) 和质量报告为准；本页的旧测试数字不是当前结果。
 
 **Phase 1E内部模拟流程：完成。真人研究Gate：`PILOT_BLOCKED`（暂不允许真人试测、发放问卷、访谈、实施任务或数据采集）。**
 
@@ -14,6 +16,6 @@
 
 ## 未满足的真人研究条件
 
-导师/学校审阅、伦理/审批责任部门和材料、工具正式版本、样本框与招募授权、知情同意及退出流程、数据安全与保存/销毁规定、任务关联可行性、真实招聘数据来源及许可均仍须人工确认。赛道继续 `WAIT_NO_REASK`；BTBU/CUFE渠道继续 `WAIT_SUPERVISOR_EXTERNAL_CONFIRMATION`。不得将模拟流程通过改写成 `PILOT_READY`。
+当时的导师/学校审阅、伦理/审批责任部门和材料、工具正式版本、样本框与招募授权、知情同意及退出流程、数据安全与保存/销毁规定、任务关联可行性、真实招聘数据来源及许可均仍须人工确认。当时赛道为 `WAIT_NO_REASK`（历史状态，已由 Phase 1F 导师方向反馈更新）；BTBU/CUFE渠道仍为 `WAIT_SUPERVISOR_EXTERNAL_CONFIRMATION`。不得将模拟流程通过改写成 `PILOT_READY`。
 
 Phase 1E只证明技术与设计流程可预演，不证明测量或研究假设成立；正式v0.3未冻结。

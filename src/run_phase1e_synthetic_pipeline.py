@@ -1,4 +1,4 @@
-"""依次运行全部Phase 1E模拟流程并生成质量报告。"""
+"""顺序运行模拟生成、严格校验、分项分析和动态质量报告。"""
 
 from __future__ import annotations
 
@@ -10,13 +10,54 @@ from pathlib import Path
 import pandas as pd
 
 from src.generate_synthetic_data import build_synthetic_bundle, write_bundle
-from src.validate_synthetic_data import validate_files
+from src.validate_synthetic_data import load_bundle, quality_summary, validate_bundle, validate_files
+
+
+def _write_quality_report(bundle: dict, errors: list[str]) -> None:
+    """依据实际模拟记录和校验函数输出质量摘要。"""
+    metrics = quality_summary(bundle)
+    frames = {
+        "问卷": pd.DataFrame(bundle["survey"]), "短任务": pd.DataFrame(bundle["task"]),
+        "评分": pd.DataFrame(bundle["ratings"]), "岗位": pd.DataFrame(bundle["jobs"]),
+        "岗位标签": pd.DataFrame(bundle["labels"]),
+    }
+    lines = ["# Phase 1F 模拟数据质量检查报告", "", "**本报告只反映流程模拟数据，不得用于研究结论。**", "",
+             "## 文件结构", "", "| 文件 | 行数 | 字段数 |", "|---|---:|---:|"]
+    lines.extend(f"| {name} | {len(frame)} | {len(frame.columns)} |" for name, frame in frames.items())
+    lines.extend(["", "## 跳题与任务可评分状态", "",
+                  f"- 严格跳题违规数：{metrics['strict_skip_violations']}",
+                  f"- AI未使用者过程字段违规数：{metrics['ai_nonuser_field_violations']}",
+                  f"- COMPLETE：{metrics['complete_count']}", f"- PARTIAL：{metrics['partial_count']}",
+                  f"- ABORTED：{metrics['aborted_count']}", f"- 完整六维分析可用记录：{metrics['analysis_eligible_count']}",
+                  f"- 不可评分维度数：{metrics['unscorable_dimension_count']}", f"- 实际评分长表记录数：{metrics['rating_row_count']}",
+                  f"- 任务评分范围异常数：{metrics['score_range_anomalies']}", "",
+                  "## 关联与主键", "", f"- 问卷research_id重复数：{metrics['duplicate_research_id_count']}",
+                  f"- 岗位stable_job_record_key重复数：{metrics['duplicate_job_key_count']}",
+                  f"- 非问卷子集任务记录数：{metrics['task_not_survey_count']}",
+                  f"- 非任务子集评分记录数：{metrics['rating_not_task_count']}", "",
+                  f"- 实际异常计数：{metrics['anomaly_count']}", f"- Validator错误条数：{len(errors)}",
+                  "- 验证信息：" + ("无异常。" if not errors else "；".join(errors)),
+                  "- 任务表现均值仅使用 `COMPLETE` 且 `analysis_eligible=TRUE` 的记录。",
+                  "- `PARTIAL`未进入默认完整六维均值；`ABORTED`未评分、未进入均值。",
+                  "- 0分表示存在可评作答但未呈现该行为；`NOT_SCORABLE`表示没有足够作答，两者不互换。",
+                  "- 所有模拟CSV均检查 `synthetic_flag=TRUE`；不设置真实身份映射。", ""])
+    output = Path("results/synthetic")
+    output.mkdir(parents=True, exist_ok=True)
+    (output / "data_quality_report.md").write_text("\n".join(lines), encoding="utf-8")
+    env = {"python_version": sys.version.split()[0], "pandas_version": version("pandas"),
+           "matplotlib_version": version("matplotlib"), "seed": 20261004,
+           "synthetic_version": "phase1f_validation_v1", "pipeline_exit_code": 0 if not errors else 1,
+           "synthetic_only": True}
+    pd.Series(env).to_json(output / "execution_environment.json", force_ascii=False, indent=2)
 
 
 def main() -> int:
+    """运行固定顺序的Phase 1F模拟链，任一分析失败均返回非零。"""
     write_bundle(build_synthetic_bundle(), Path("data/synthetic"))
     errors = validate_files()
+    bundle = load_bundle()
     if errors:
+        _write_quality_report(bundle, errors)
         print("校验失败：" + "；".join(errors))
         return 1
     modules = ["src.analyze_student_survey_synthetic", "src.analyze_task_synthetic", "src.analyze_linked_student_task_synthetic",
@@ -24,35 +65,21 @@ def main() -> int:
     for module in modules:
         result = subprocess.run([sys.executable, "-m", module], check=False)
         if result.returncode:
-            print(f"模块失败：{module}，退出码 {result.returncode}")
+            errors.append(f"{module}退出码{result.returncode}")
+            _write_quality_report(bundle, errors)
+            print(errors[-1])
             return result.returncode
-    try:
-        result = subprocess.run([sys.executable, "-m", "src.plot_synthetic_results"], check=False)
-        if result.returncode:
-            print("可选模拟绘图未通过。")
-            return result.returncode
-    except Exception as exc:
-        print(f"可选绘图跳过：{exc}")
-
-    data_dir = Path("data/synthetic")
-    survey = pd.read_csv(data_dir / "student_survey_synthetic.csv", keep_default_na=False)
-    task = pd.read_csv(data_dir / "student_task_synthetic.csv", keep_default_na=False)
-    ratings = pd.read_csv(data_dir / "task_ratings_synthetic.csv", keep_default_na=False)
-    jobs = pd.read_csv(data_dir / "enterprise_jobs_synthetic.csv", keep_default_na=False)
-    labels = pd.read_csv(data_dir / "enterprise_job_labels_synthetic.csv", keep_default_na=False)
-    lines = ["# 模拟数据质量检查报告", "", "**本报告仅描述人工构造的流程测试数据，不得用于研究结论。**", "",
-             "| 文件 | 行数 | 字段数 | 主键/关联检查 | 缺失码统计 |", "|---|---:|---:|---|---|"]
-    for name, frame, key in (("问卷", survey, "research_id"), ("短任务", task, "research_id"), ("评分", ratings, "research_id+rater_id+dimension"), ("岗位", jobs, "stable_job_record_key"), ("岗位标签", labels, "stable_job_record_key+dimension")):
-        missing_codes = int(frame.astype(str).isin(["NA_SKIP", "NA_APPL", "NA_DK", "NA_MISS", "NA_REFUSE"]).sum().sum())
-        lines.append(f"| {name} | {len(frame)} | {len(frame.columns)} | {key} | {missing_codes}个显式缺失/跳题码 |")
-    lines.extend(["", f"- 任务编号均来自问卷：{set(task.research_id) <= set(survey.research_id)}。", f"- 评分编号均来自任务：{set(ratings.research_id) <= set(task.research_id)}。",
-                  "- 所有CSV行均有 `synthetic_flag=TRUE`；未设置真实身份映射表。", "- 异常记录数：0。", "- 缺失/跳题码：NA_SKIP、NA_APPL、NA_DK、NA_MISS；均未用空白或0代替。", ""])
-    Path("results/synthetic").mkdir(parents=True, exist_ok=True)
-    Path("results/synthetic/data_quality_report.md").write_text("\n".join(lines), encoding="utf-8")
-    env_record = {"python_version": sys.version.split()[0], "pandas_version": version("pandas"), "matplotlib_version": version("matplotlib"),
-                  "seed": 20261004, "pipeline_exit_code": 0, "synthetic_only": True}
-    pd.Series(env_record).to_json("results/synthetic/execution_environment.json", force_ascii=False, indent=2)
-    print("Phase 1E模拟流水线全部完成。")
+    result = subprocess.run([sys.executable, "-m", "src.plot_synthetic_results"], check=False)
+    if result.returncode:
+        errors.append(f"模拟绘图退出码{result.returncode}")
+        _write_quality_report(bundle, errors)
+        return result.returncode
+    errors = validate_files()
+    _write_quality_report(bundle, errors)
+    if errors:
+        print("流水线末尾校验失败：" + "；".join(errors))
+        return 1
+    print("Phase 1F模拟流水线完成；质量报告指标均由实际记录计算。")
     return 0
 
 

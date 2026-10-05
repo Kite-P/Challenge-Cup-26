@@ -3,6 +3,7 @@
   "pandas_version":"3.0.5",
   "matplotlib_version":"3.11.1",
   "seed":20261004,
+  "synthetic_version":"phase1f_validation_v1",
   "pipeline_exit_code":0,
   "synthetic_only":true
 }

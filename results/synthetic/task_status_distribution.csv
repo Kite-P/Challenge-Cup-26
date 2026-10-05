@@ -1,0 +1,4 @@
+﻿synthetic_flag,task_status,count,proportion
+TRUE,COMPLETE,56,0.7
+TRUE,PARTIAL,18,0.225
+TRUE,ABORTED,6,0.075
