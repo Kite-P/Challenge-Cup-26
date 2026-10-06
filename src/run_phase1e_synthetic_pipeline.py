@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import json
 from importlib.metadata import version
 from pathlib import Path
 
@@ -13,9 +14,31 @@ from src.generate_synthetic_data import build_synthetic_bundle, write_bundle
 from src.validate_synthetic_data import load_bundle, quality_summary, validate_bundle, validate_files
 
 
+def _validate_schema_files(directory: Path = Path("schemas")) -> tuple[int, list[str]]:
+    """检查 JSON schema 可解析、required 字段存在且具备模拟边界说明。"""
+    paths = sorted(directory.glob("*.json"))
+    errors = []
+    for path in paths:
+        try:
+            schema = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            errors.append(f"schema不可解析：{path.name}: {exc}")
+            continue
+        properties = schema.get("properties", {})
+        required = schema.get("required", [])
+        if not properties or not set(required) <= set(properties):
+            errors.append(f"schema字段定义不完整：{path.name}")
+        if any("description_zh" not in item or "synthetic_only" not in item for item in properties.values()):
+            errors.append(f"schema字段缺少中文说明或synthetic_only：{path.name}")
+    if not paths:
+        errors.append("schema目录没有JSON schema")
+    return len(paths), errors
+
+
 def _write_quality_report(bundle: dict, errors: list[str]) -> None:
     """依据实际模拟记录和校验函数输出质量摘要。"""
     metrics = quality_summary(bundle)
+    schema_count, schema_errors = _validate_schema_files()
     frames = {
         "问卷": pd.DataFrame(bundle["survey"]), "短任务": pd.DataFrame(bundle["task"]),
         "评分": pd.DataFrame(bundle["ratings"]), "岗位": pd.DataFrame(bundle["jobs"]),
@@ -36,7 +59,11 @@ def _write_quality_report(bundle: dict, errors: list[str]) -> None:
                   f"- 非问卷子集任务记录数：{metrics['task_not_survey_count']}",
                   f"- 非任务子集评分记录数：{metrics['rating_not_task_count']}", "",
                   f"- 实际异常计数：{metrics['anomaly_count']}", f"- Validator错误条数：{len(errors)}",
+                  f"- JSON schema 数量：{schema_count}",
+                  f"- schema 一致性：{'PASS' if not schema_errors else 'FAIL'}",
+                  f"- 校验版本：`phase1f_validation_v1`（合成流程版本，不是研究版本）",
                   "- 验证信息：" + ("无异常。" if not errors else "；".join(errors)),
+                  "- schema问题：" + ("无。" if not schema_errors else "；".join(schema_errors)),
                   "- 任务表现均值仅使用 `COMPLETE` 且 `analysis_eligible=TRUE` 的记录。",
                   "- `PARTIAL`未进入默认完整六维均值；`ABORTED`未评分、未进入均值。",
                   "- 0分表示存在可评作答但未呈现该行为；`NOT_SCORABLE`表示没有足够作答，两者不互换。",
@@ -55,6 +82,8 @@ def main() -> int:
     """运行固定顺序的Phase 1F模拟链，任一分析失败均返回非零。"""
     write_bundle(build_synthetic_bundle(), Path("data/synthetic"))
     errors = validate_files()
+    _, schema_errors = _validate_schema_files()
+    errors.extend(schema_errors)
     bundle = load_bundle()
     if errors:
         _write_quality_report(bundle, errors)

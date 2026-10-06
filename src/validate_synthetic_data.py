@@ -13,12 +13,17 @@ SURVEY_STAGE_FIELDS = ("ai_stage_problem", "ai_stage_information", "ai_stage_met
 SURVEY_DETAIL_FIELDS = ("ai_reason_check", "ai_gave_sources", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance", "method_choice_occurred")
 AI_RECALL_SKIP = ("ai_reason_check", "ai_gave_sources", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance", "method_choice_occurred")
 NA_VALUES = {"NA_SKIP", "NA_APPL", "NA_DK", "NA_MISS", "NA_REFUSE"}
+SYNTHETIC_VERSION = "phase1f_validation_v1"
 
 
 def load_bundle(directory: Path = Path("data/synthetic")) -> dict[str, list[dict]]:
     """读取项目的五类模拟CSV。"""
     mapping = {"survey": "student_survey_synthetic.csv", "task": "student_task_synthetic.csv", "ratings": "task_ratings_synthetic.csv", "jobs": "enterprise_jobs_synthetic.csv", "labels": "enterprise_job_labels_synthetic.csv"}
-    return {key: list(csv.DictReader((directory / filename).open(encoding="utf-8-sig", newline=""))) for key, filename in mapping.items()}
+    bundle = {}
+    for key, filename in mapping.items():
+        with (directory / filename).open(encoding="utf-8-sig", newline="") as stream:
+            bundle[key] = list(csv.DictReader(stream))
+    return bundle
 
 
 def _scoreable(value: object) -> bool:
@@ -78,6 +83,8 @@ def validate_bundle(bundle: dict) -> list[str]:
     for name, rows in (("survey", survey), ("task", task), ("ratings", ratings), ("jobs", jobs), ("labels", labels)):
         if any(row.get("synthetic_flag") != "TRUE" for row in rows):
             errors.append(f"{name}: 存在未标记为模拟的数据行")
+        if any(row.get("synthetic_version") != SYNTHETIC_VERSION for row in rows):
+            errors.append(f"{name}: 模拟数据版本缺失或不匹配")
 
     survey_ids = [row["research_id"] for row in survey]
     if len(survey_ids) != len(set(survey_ids)):

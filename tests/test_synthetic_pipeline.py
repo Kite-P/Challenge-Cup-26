@@ -6,6 +6,7 @@ from copy import deepcopy
 from pathlib import Path
 
 from src.generate_synthetic_data import build_synthetic_bundle
+from src.rater_reliability import weighted_cohen_kappa
 from src.validate_synthetic_data import quality_summary, validate_bundle
 
 
@@ -86,6 +87,26 @@ class SyntheticPipelineTests(unittest.TestCase):
         altered["task"][0]["problem_definition"] = 3
         self.assertTrue(any("评分超出" in error for error in validate_bundle(altered)))
 
+    def test_validator_rejects_wrong_synthetic_flag(self):
+        changed = deepcopy(self.bundle)
+        changed["jobs"][0]["synthetic_flag"] = "FALSE"
+        self.assertTrue(any("未标记为模拟" in error for error in validate_bundle(changed)))
+
+    def test_validator_rejects_wrong_synthetic_version(self):
+        changed = deepcopy(self.bundle)
+        changed["survey"][0]["synthetic_version"] = "unexpected_version"
+        self.assertTrue(any("版本缺失或不匹配" in error for error in validate_bundle(changed)))
+
+    def test_validator_rejects_duplicate_stable_job_key(self):
+        changed = deepcopy(self.bundle)
+        changed["jobs"][1]["stable_job_record_key"] = changed["jobs"][0]["stable_job_record_key"]
+        self.assertTrue(any("stable_job_record_key 不唯一" in error for error in validate_bundle(changed)))
+
+    def test_validator_rejects_duplicate_research_id(self):
+        changed = deepcopy(self.bundle)
+        changed["survey"][1]["research_id"] = changed["survey"][0]["research_id"]
+        self.assertTrue(any("research_id 不唯一" in error for error in validate_bundle(changed)))
+
     def test_two_raters_have_some_disagreement(self):
         paired = {}
         for row in self.bundle["ratings"]:
@@ -165,6 +186,32 @@ class SyntheticPipelineTests(unittest.TestCase):
         row = next(row for row in changed["task"] if row["task_status"] == "ABORTED")
         row["problem_definition"] = 0
         self.assertTrue(any("不可评分" in error or "ABORTED" in error for error in validate_bundle(changed)))
+
+    def test_weighted_kappa_full_agreement_is_one(self):
+        result = weighted_cohen_kappa([0, 1, 2], [0, 1, 2])
+        self.assertEqual(result["n_pairs"], 3)
+        self.assertAlmostEqual(result["kappa"], 1.0)
+        self.assertIsNone(result["undefined_reason"])
+
+    def test_weighted_kappa_ignores_unpaired_missing_ratings(self):
+        result = weighted_cohen_kappa([0, None, 2, "NA_SKIP"], [0, 1, 2, 1])
+        self.assertEqual(result["n_pairs"], 2)
+        self.assertAlmostEqual(result["kappa"], 1.0)
+
+    def test_weighted_kappa_reports_undefined_for_single_category(self):
+        result = weighted_cohen_kappa([1, 1, 1], [1, 1, 1])
+        self.assertIsNone(result["kappa"])
+        self.assertEqual(result["undefined_reason"], "NO_EXPECTED_DISAGREEMENT")
+
+    def test_weighted_kappa_matches_known_quadratic_example(self):
+        result = weighted_cohen_kappa([0, 0, 1, 1], [0, 1, 1, 2])
+        self.assertAlmostEqual(result["kappa"], 0.5)
+
+    def test_weighted_kappa_rejects_invalid_score_and_length(self):
+        with self.assertRaises(ValueError):
+            weighted_cohen_kappa([0, 3], [0, 2])
+        with self.assertRaises(ValueError):
+            weighted_cohen_kappa([0], [0, 1])
 
 
 if __name__ == "__main__":

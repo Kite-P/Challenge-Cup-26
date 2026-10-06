@@ -33,7 +33,11 @@
 
 - 实际异常计数：0
 - Validator错误条数：0
+- JSON schema 数量：5
+- schema 一致性：PASS
+- 校验版本：`phase1f_validation_v1`（合成流程版本，不是研究版本）
 - 验证信息：无异常。
+- schema问题：无。
 - 任务表现均值仅使用 `COMPLETE` 且 `analysis_eligible=TRUE` 的记录。
 - `PARTIAL`未进入默认完整六维均值；`ABORTED`未评分、未进入均值。
 - 0分表示存在可评作答但未呈现该行为；`NOT_SCORABLE`表示没有足够作答，两者不互换。
