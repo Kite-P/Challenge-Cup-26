@@ -28,7 +28,7 @@
 | 团队协作 | `DESIGN_DERIVED`、`PENDING_JOB_TEXT_VALIDATION` | 需岗位职责证据，不能由团队项目经历直接等值 |
 | 数字工具与 AI 应用 | `DESIGN_DERIVED`、`PENDING_JOB_TEXT_VALIDATION` | 工具名不等同能力；AI岗位独立可选，不代表总体需求 |
 | 行业/岗位专业知识 | `DESIGN_DERIVED`、`PENDING_JOB_TEXT_VALIDATION` | 当前学生中性任务刻意不测专门知识，预期多为 `NO_DIRECT_MATCH` |
-| 独立判断与责任 | `LITERATURE_SUPPORTED`、`STUDENT_MAPPING_DRIVEN`、`PENDING_JOB_TEXT_VALIDATION` | 学生决策论证与工作责任有本质差异，通常只能部分映射 |
+| 独立研究决策与责任 | `LITERATURE_SUPPORTED`、`STUDENT_MAPPING_DRIVEN`、`PENDING_JOB_TEXT_VALIDATION` | 学生决策论证与工作责任有本质差异，通常只能部分映射 |
 
 上述支持均不是岗位文本实证结论。taxonomy 不冻结；出现重复、不可区分、文本缺乏证据或法律/许可限制时允许合并、拆分或删除。
 

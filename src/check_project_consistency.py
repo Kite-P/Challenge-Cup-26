@@ -23,17 +23,37 @@ ACTIVE_DOCS = (
     "docs/competition/01_比赛方向与赛道状态.md",
     "docs/review/当前项目状态_单页.md",
     "docs/review/当前活跃研究设计索引.md",
+    "docs/phase1/12_blueprint_v0_3_candidate.md",
+    "docs/phase1/41_核心构念操作化审计.md",
+    "docs/phase1/43_目标总体与抽样框架.md",
+    "docs/phase1/45_社会调查实施SOP_草案.md",
+    "docs/phase1/49_预分析计划_v0_1_candidate.md",
+    "docs/phase1/50_analysis_variable_registry.md",
+    "docs/phase1/52_phase1g_gate.md",
+    "docs/phase1/53_企业岗位数据最小集与taxonomy审计.md",
+    "docs/phase1/approval/03_data_management_plan_v0_1.md",
+    "docs/phase1/approval/04_参与者信息说明_草案.md",
+    "docs/phase1/instruments/01_research_task_A_v0_4_review_ready.md",
+    "docs/phase1/instruments/05_questionnaire_v0_4_review_ready.md",
+    "docs/phase1/instruments/09_student_interview_v0_3_short.md",
+    "docs/phase1/instruments/10_teacher_interview_v0_2_short.md",
+    "docs/phase1/instruments/11_short_task_scoring_v0_5_candidate.md",
 )
 
 
 def scan_text(text: str, *, classification: str = "ACTIVE", path: str = "<memory>") -> list[str]:
     """对单份文本执行可单测的规则扫描；历史行需显式标注。"""
     findings: list[str] = []
+    historical_section = False
     for line_number, line in enumerate(text.splitlines(), start=1):
-        historical_line = classification == "HISTORICAL" or bool(re.search(r"HISTORICAL|历史版本|往届|当时|已被.*取代", line, re.I))
+        if line.lstrip().startswith("#"):
+            historical_section = bool(re.search(r"HISTORICAL|历史|往届", line, re.I))
+        historical_line = classification == "HISTORICAL" or historical_section or bool(re.search(r"HISTORICAL|历史版本|早期|往届|当时|已被.*取代|扫描词|检索词", line, re.I))
         if classification == "ACTIVE" and not historical_line and OLD_TERMS.search(line):
             findings.append(f"ACTIVE_OLD_TERM:{path}:{line_number}")
-        if not historical_line and re.search(r"PILOT_READY|PHASE1_READY_FOR_COLLECTION", line):
+        unsafe_ready = re.search(r"PILOT_READY|PHASE1_READY_FOR_COLLECTION", line)
+        explicitly_rejected = bool(re.search(r"(?:不把|不改|不设|不写|不得|禁止|避免|不要|未改为).{0,30}(?:PILOT_READY|PHASE1_READY_FOR_COLLECTION)", line))
+        if not historical_line and unsafe_ready and not explicitly_rejected:
             findings.append(f"UNSAFE_READY_STATUS:{path}:{line_number}")
         if not historical_line and PAST_DEADLINE_AS_CURRENT.search(line):
             findings.append(f"PAST_DEADLINE_AS_CURRENT:{path}:{line_number}")
