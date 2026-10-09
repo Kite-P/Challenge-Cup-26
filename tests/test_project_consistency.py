@@ -15,6 +15,11 @@ class ProjectConsistencyTests(unittest.TestCase):
         self.assertIn("docs/phase1/instruments/07_student_interview_v0_3_supervisor_review.md", ACTIVE_DOCS)
         self.assertIn("docs/phase1/instruments/08_teacher_interview_v0_3_supervisor_review.md", ACTIVE_DOCS)
 
+    def test_active_document_scan_targets_phase1h_gate_and_master_draft(self):
+        self.assertIn("docs/phase1/54_phase1h_gate.md", ACTIVE_DOCS)
+        self.assertIn("docs/review/Phase1H_导师审阅包.md", ACTIVE_DOCS)
+        self.assertIn("docs/report/大挑社会调查报告_Master_v0_1.md", ACTIVE_DOCS)
+
     def test_active_old_term_is_detected_but_historical_line_is_allowed(self):
         self.assertTrue(any("ACTIVE_OLD_TERM" in x for x in scan_text("当前核心构念：信息评价")))
         self.assertFalse(scan_text("HISTORICAL：当时使用信息评价"))

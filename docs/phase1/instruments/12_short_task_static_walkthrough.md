@@ -2,7 +2,7 @@
 
 **醒目标识：`SYNTHETIC EXAMPLE`。**以下答案由文本构造，只用于桌面检查题目是否产生不同作答、评分锚点是否可区分，以及有无明显唯一答案暗示。不是真人试测、认知访谈、预测试或参与者数据；不得用于估计时长、难度、信效度或效果。
 
-评分依据见 [`11_short_task_scoring_v0_4.md`](11_short_task_scoring_v0_4.md)。分数只是对下列合成文字按候选锚点演示。
+**历史演练：**本文件按旧版 v0.4 六维锚点撰写，仅作版本沿革，不代表当前五维评分。当前任务与评分以 [`01_research_task_A_v0_5_supervisor_review.md`](01_research_task_A_v0_5_supervisor_review.md) 和 [`11_short_task_scoring_v0_5_candidate.md`](11_short_task_scoring_v0_5_candidate.md) 为准。分数只是对下列合成文字按旧候选锚点演示。
 
 ## 合成作答甲（较弱示例）
 

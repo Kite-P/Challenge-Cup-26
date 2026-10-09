@@ -8,7 +8,7 @@
 
 ## 当前状态与不可做事项
 
-当前阶段为 Phase 1G 内部审计，真人研究状态为 `PILOT_BLOCKED`。问卷、任务、访谈、样本流程及同意材料均未获批准或冻结。不得据仓库文档自行联系、招募、试测、发放问卷、访谈、收集数据或启动企业岗位数据获取；仓库中 `PENDING` / `UNKNOWN` 事项需由相应人工或正式文件确认。
+当前阶段为 Phase 1H 文档与候选工具审阅闭环，真人研究状态仍为 `PILOT_BLOCKED`。问卷 v0.5、短任务/评分 v0.5、访谈 v0.3、报告 Master Draft 均为审阅候选；没有一项获准实施或冻结。不得据仓库文档自行联系、招募、试测、发放问卷、访谈、收集数据或启动企业岗位数据获取；仓库中 `PENDING` / `UNKNOWN` 事项需由相应人工或正式文件确认。
 
 校园数字学习工具与学习资源仅是低专业门槛的中性任务情境，并非研究主题。主线是 AI 协作方式与信息辨识与评估能力、方法理解与适配、独立研究决策能力及特定任务表现之间的关系；不预设因果或正向结论。
 
@@ -21,7 +21,7 @@ python -m compileall -q src tests
 python -m src.run_repo_checks --pipeline
 ```
 
-`data/synthetic/` 与 `results/synthetic/` 仅用于软件流程验证，不是学生或企业研究数据。完整实施门禁见 [`docs/phase1/52_phase1g_gate.md`](phase1/52_phase1g_gate.md)。
+`data/synthetic/` 与 `results/synthetic/` 仅用于软件流程验证，不是学生或企业研究数据。最新文档门禁见 [`docs/phase1/54_phase1h_gate.md`](phase1/54_phase1h_gate.md)；历史 Phase 1G 门禁见 [`docs/phase1/52_phase1g_gate.md`](phase1/52_phase1g_gate.md)。
 
 ## 文档使用规则
 

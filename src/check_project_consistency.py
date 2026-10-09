@@ -23,6 +23,8 @@ ACTIVE_DOCS = (
     "docs/competition/01_比赛方向与赛道状态.md",
     "docs/review/当前项目状态_单页.md",
     "docs/review/当前活跃研究设计索引.md",
+    "docs/review/Phase1H_导师审阅包.md",
+    "docs/report/大挑社会调查报告_Master_v0_1.md",
     "docs/phase1/12_blueprint_v0_3_candidate.md",
     "docs/phase1/41_核心构念操作化审计.md",
     "docs/phase1/43_目标总体与抽样框架.md",
@@ -30,6 +32,7 @@ ACTIVE_DOCS = (
     "docs/phase1/49_预分析计划_v0_1_candidate.md",
     "docs/phase1/50_analysis_variable_registry.md",
     "docs/phase1/52_phase1g_gate.md",
+    "docs/phase1/54_phase1h_gate.md",
     "docs/phase1/53_企业岗位数据最小集与taxonomy审计.md",
     "docs/phase1/approval/03_data_management_plan_v0_1.md",
     "docs/phase1/approval/04_参与者信息说明_草案.md",
@@ -38,6 +41,7 @@ ACTIVE_DOCS = (
     "docs/phase1/instruments/07_student_interview_v0_3_supervisor_review.md",
     "docs/phase1/instruments/08_teacher_interview_v0_3_supervisor_review.md",
     "docs/phase1/instruments/11_short_task_scoring_v0_5_candidate.md",
+    "docs/phase1/instruments/13_short_task_measurement_blueprint.md",
 )
 
 
