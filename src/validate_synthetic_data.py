@@ -42,7 +42,7 @@ def strict_skip_violation_count(bundle: dict) -> int:
         if recent != "YES":
             count += sum(row.get(field) != "NA_SKIP" for field in SURVEY_RECALL_FIELDS)
             continue
-        if row.get("recent_task_type") not in {"COURSE_RESEARCH", "COURSE_SURVEY_REPORT", "INNOVATION_PROJECT", "COMPETITION_RESEARCH", "MENTOR_PROJECT", "OTHER_RESEARCH_TASK"}:
+        if row.get("recent_task_type") not in {"COURSE_RESEARCH", "COURSE_SURVEY_REPORT", "INNOVATION_PROJECT", "COMPETITION_RESEARCH", "MENTOR_PROJECT", "OTHER_RESEARCH_TASK", "NA_DK", "NA_REFUSE", "NA_MISS"}:
             count += 1
         participation = row.get("task_participation_stages", "")
         if not participation or participation == "NA_SKIP":

@@ -71,6 +71,14 @@ class SyntheticPipelineTests(unittest.TestCase):
         self.assertTrue({"YES", "NO", "UNSURE", "NO_TOOL", "NA_APPL", "NA_REFUSE"} <= q7_states)
         self.assertEqual(validate_bundle(self.bundle), [])
 
+    def test_q2_unknown_and_refusal_are_distinct_simulated_answers(self):
+        q2_states = {row["recent_task_type"] for row in self.bundle["survey"] if row["recent_research_task"] == "YES"}
+        self.assertTrue({"NA_DK", "NA_REFUSE"} <= q2_states)
+
+    def test_q13_no_experience_is_distinct_from_unknown(self):
+        q13_states = {row["info_source_check"] for row in self.bundle["survey"]}
+        self.assertTrue({"NO_RELATED_EXPERIENCE", "NA_DK", "NA_REFUSE"} <= q13_states)
+
     def test_validator_rejects_q7_answer_when_q1_skips_it(self):
         changed = deepcopy(self.bundle)
         row = next(row for row in changed["survey"] if row["recent_research_task"] != "YES")

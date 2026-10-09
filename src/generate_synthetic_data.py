@@ -25,7 +25,7 @@ def build_synthetic_bundle(seed: int = 20261004, n_survey: int = 240, n_task: in
     for i, research_id in enumerate(ids):
         recent_task = ("NO", "UNSURE", "NA_REFUSE", "YES")[i % 4]
         has_task = recent_task == "YES"
-        task_type = rng.choice(task_types) if has_task else "NA_SKIP"
+        task_type = rng.choice([*task_types, "NA_DK", "NA_REFUSE", "NA_MISS"]) if has_task else "NA_SKIP"
         participation = "|".join(rng.sample(participation_stages, rng.randint(1, 3))) if has_task else "NA_SKIP"
         ai_used = ("YES", "NO", "UNSURE", "NO_TOOL", "NA_APPL", "NA_REFUSE")[(i // 4) % 6] if has_task else "NA_SKIP"
         method_choice = rng.choice(["YES", "NO", "NA_DK", "NA_MISS"]) if has_task and ai_used == "YES" else "NA_SKIP"
@@ -52,7 +52,7 @@ def build_synthetic_bundle(seed: int = 20261004, n_survey: int = 240, n_task: in
             "ai_disagreement_response": rng.choice(["COMPARE_BASIS", "ASK_AGAIN", "KEEP_VIEW", "ACCEPT", "NOT_ENCOUNTERED", "NA_DK", "NA_MISS"]) if details_shown else "NA_SKIP",
             "method_choice_occurred": method_choice if details_shown else "NA_SKIP",
             "ai_method_compare": rng.choice(["YES", "NO", "NA_DK", "NA_MISS"]) if details_shown and method_choice == "YES" else "NO_METHOD_CHOICE" if details_shown and method_choice == "NO" else method_choice if details_shown else "NA_SKIP",
-            "info_source_check": rng.choice(["SOURCE", "DATE", "SAMPLE", "MEASURE", "SUPPORT", "NA_DK", "NA_MISS"]),
+            "info_source_check": rng.choice(["SOURCE", "DATE", "SAMPLE", "MEASURE", "SUPPORT", "NO_RELATED_EXPERIENCE", "NA_DK", "NA_REFUSE", "NA_MISS"]),
             "a9_first_action": rng.choice(["CHECK_DEFINITION", "CHECK_COVERAGE", "SEEK_OTHER_EVIDENCE", "WITHHOLD_INFERENCE", "NA_MISS"]),
             "a9_reason": rng.choice(["核对指标口径", "比较可支持的结论", "补充其他材料", "NA_MISS"]),
             "recent_task_type": task_type,
