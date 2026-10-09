@@ -2,10 +2,14 @@
 
 import unittest
 
-from src.check_project_consistency import scan_text, scan_tracked_paths
+from src.check_project_consistency import ACTIVE_DOCS, scan_text, scan_tracked_paths
 
 
 class ProjectConsistencyTests(unittest.TestCase):
+    def test_active_document_scan_targets_current_questionnaire_candidate(self):
+        self.assertIn("docs/phase1/instruments/05_questionnaire_v0_5_supervisor_review.md", ACTIVE_DOCS)
+        self.assertNotIn("docs/phase1/instruments/05_questionnaire_v0_4_review_ready.md", ACTIVE_DOCS)
+
     def test_active_old_term_is_detected_but_historical_line_is_allowed(self):
         self.assertTrue(any("ACTIVE_OLD_TERM" in x for x in scan_text("当前核心构念：信息评价")))
         self.assertFalse(scan_text("HISTORICAL：当时使用信息评价"))

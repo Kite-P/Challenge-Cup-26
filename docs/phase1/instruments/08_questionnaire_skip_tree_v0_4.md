@@ -1,4 +1,6 @@
-# 问卷严格跳题树 v0.4（内部复核）
+# HISTORICAL｜问卷严格跳题树 v0.4（内部复核）
+
+当前候选路径见 [`08_questionnaire_skip_tree_v0_5_candidate.md`](08_questionnaire_skip_tree_v0_5_candidate.md)。
 
 本文件按现有问卷 v0.4 审阅稿定义模拟与校验口径，不修改真人工具，也不授权实施。
 

@@ -1,4 +1,6 @@
-# 问卷题组—研究问题—分析映射（v0.4候选）
+# HISTORICAL｜问卷题组—研究问题—分析映射（v0.4候选）
+
+当前候选映射见 [`07_questionnaire_analysis_map_v0_5.md`](07_questionnaire_analysis_map_v0_5.md)。
 
 | 题组 | 为什么保留 | 对应RQ | 候选用途 | 若不使用的删题判断 |
 |---|---|---|---|---|

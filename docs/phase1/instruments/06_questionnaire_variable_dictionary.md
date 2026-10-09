@@ -1,4 +1,6 @@
-# 问卷变量字典（v0.4候选）
+# HISTORICAL｜问卷变量字典（v0.4候选）
+
+当前题目与变量映射以 [`06_questionnaire_variable_dictionary_v0_5.md`](06_questionnaire_variable_dictionary_v0_5.md) 为准；本表保留v0.4历史题号映射。
 
 **状态：**依据审阅候选问卷建立，尚未批准发放。变量名为临时稳定标识；缺失码不等于零分。
 

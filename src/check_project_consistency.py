@@ -34,7 +34,7 @@ ACTIVE_DOCS = (
     "docs/phase1/approval/03_data_management_plan_v0_1.md",
     "docs/phase1/approval/04_参与者信息说明_草案.md",
     "docs/phase1/instruments/01_research_task_A_v0_4_review_ready.md",
-    "docs/phase1/instruments/05_questionnaire_v0_4_review_ready.md",
+    "docs/phase1/instruments/05_questionnaire_v0_5_supervisor_review.md",
     "docs/phase1/instruments/09_student_interview_v0_3_short.md",
     "docs/phase1/instruments/10_teacher_interview_v0_2_short.md",
     "docs/phase1/instruments/11_short_task_scoring_v0_5_candidate.md",

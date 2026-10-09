@@ -2,6 +2,8 @@
 
 **状态：**`ACTIVE_CANDIDATE`、`PENDING_APPROVAL`；未预注册、无真实数据、无结果，项目仍为 `PILOT_BLOCKED`。
 
+**工具版本提示：**当前问卷审阅入口为 [`05_questionnaire_v0_5_supervisor_review.md`](instruments/05_questionnaire_v0_5_supervisor_review.md)。本文的变量边界仍为候选；题号、题项类别和跳题需按v0.5重新核对后才能形成实施版预分析计划。
+
 ## 主要问题和估计边界
 
 描述财经相关本科生在研究型学习任务中的 AI 协作方式，并考察其与信息辨识与评估能力、方法理解与适配、独立研究决策能力及特定任务表现的关联。方向可正、负、为零、非线性或异质；横截面结果只称关联，不称影响或因果。
