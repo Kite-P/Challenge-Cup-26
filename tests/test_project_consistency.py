@@ -10,6 +10,11 @@ class ProjectConsistencyTests(unittest.TestCase):
         self.assertIn("docs/phase1/instruments/05_questionnaire_v0_5_supervisor_review.md", ACTIVE_DOCS)
         self.assertNotIn("docs/phase1/instruments/05_questionnaire_v0_4_review_ready.md", ACTIVE_DOCS)
 
+    def test_active_document_scan_targets_phase1h_instrument_candidates(self):
+        self.assertIn("docs/phase1/instruments/01_research_task_A_v0_5_supervisor_review.md", ACTIVE_DOCS)
+        self.assertIn("docs/phase1/instruments/07_student_interview_v0_3_supervisor_review.md", ACTIVE_DOCS)
+        self.assertIn("docs/phase1/instruments/08_teacher_interview_v0_3_supervisor_review.md", ACTIVE_DOCS)
+
     def test_active_old_term_is_detected_but_historical_line_is_allowed(self):
         self.assertTrue(any("ACTIVE_OLD_TERM" in x for x in scan_text("当前核心构念：信息评价")))
         self.assertFalse(scan_text("HISTORICAL：当时使用信息评价"))
