@@ -5,7 +5,8 @@ from src.synthetic_analysis_common import count_table, read
 
 def main() -> int:
     data = read("student_survey_synthetic.csv")
-    specs = [("research_experience_type", "survey_experience_distribution.csv"), ("ai_used", "survey_ai_use.csv"),
+    specs = [("recent_task_type", "survey_recent_task_type.csv"), ("task_participation_stages", "survey_task_participation.csv"),
+             ("ai_used", "survey_ai_use.csv"),
              ("ai_stage_problem", "survey_ai_stages.csv"), ("ai_reason_check", "survey_reason_check.csv"),
              ("ai_evidence_check", "survey_evidence_handling.csv"), ("ai_output_handling", "survey_output_handling.csv"),
              ("ai_disagreement_response", "survey_conflict_handling.csv"), ("ai_method_compare", "survey_method_comparison.csv"),

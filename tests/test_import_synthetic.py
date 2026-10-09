@@ -12,21 +12,22 @@ from src.validate_synthetic_data import validate_files
 
 class SyntheticImportTests(unittest.TestCase):
     def test_questionnaire_maps_mock_export_values(self):
-        rows = [{"平台响应ID": "MOCK-1", "最近是否完成研究任务": "是", "最近任务中是否使用生成式AI": "否", "科研经历类型": "课程项目"}]
+        rows = [{"平台响应ID": "MOCK-1", "Q1_最近是否参与研究型学习任务": "是", "Q2_最近任务类型": "课程研究作业/课程论文", "Q3_实际参与环节": "确定或缩小研究问题|分析材料/数据", "Q7_最近任务AI使用": "没有使用"}]
         result = transform_survey_export(rows)
         self.assertEqual(result[0]["research_id"], "SYN-MOCK-1")
         self.assertEqual(result[0]["recent_research_task"], "YES")
         self.assertEqual(result[0]["ai_used"], "NO")
-        self.assertEqual(result[0]["research_experience_type"], "COURSE_BASED")
+        self.assertEqual(result[0]["recent_task_type"], "COURSE_RESEARCH")
+        self.assertEqual(result[0]["task_participation_stages"], "DEFINE_QUESTION|ANALYZE_DATA")
         self.assertEqual(result[0]["synthetic_flag"], "TRUE")
 
     def test_questionnaire_rejects_missing_column_unknown_option_and_duplicate_id(self):
         with self.assertRaisesRegex(ValueError, "缺少必需列"):
             transform_survey_export([{"平台响应ID": "MOCK-1"}])
-        row = {"平台响应ID": "MOCK-1", "最近是否完成研究任务": "也许", "最近任务中是否使用生成式AI": "否", "科研经历类型": "课程项目"}
+        row = {"平台响应ID": "MOCK-1", "Q1_最近是否参与研究型学习任务": "也许", "Q2_最近任务类型": "课程研究作业/课程论文", "Q3_实际参与环节": "确定或缩小研究问题", "Q7_最近任务AI使用": "没有使用"}
         with self.assertRaisesRegex(ValueError, "未知选项"):
             transform_survey_export([row])
-        valid = {**row, "最近是否完成研究任务": "是"}
+        valid = {**row, "Q1_最近是否参与研究型学习任务": "是"}
         with self.assertRaisesRegex(ValueError, "重复响应ID"):
             transform_survey_export([valid, valid])
 
@@ -45,8 +46,13 @@ class SyntheticImportTests(unittest.TestCase):
             self.assertNotIn("平台提交时间", text)
 
     def test_questionnaire_rejects_unregistered_column(self):
-        row = {"平台响应ID": "MOCK-1", "最近是否完成研究任务": "是", "最近任务中是否使用生成式AI": "否", "科研经历类型": "无", "设备指纹": "x"}
+        row = {"平台响应ID": "MOCK-1", "Q1_最近是否参与研究型学习任务": "是", "Q2_最近任务类型": "课程研究作业/课程论文", "Q3_实际参与环节": "确定或缩小研究问题", "Q7_最近任务AI使用": "没有使用", "设备指纹": "x"}
         with self.assertRaisesRegex(ValueError, "未登记列"):
+            transform_survey_export([row])
+
+    def test_questionnaire_rejects_task_answers_when_q1_skips_them(self):
+        row = {"平台响应ID": "MOCK-1", "Q1_最近是否参与研究型学习任务": "否", "Q2_最近任务类型": "课程研究作业/课程论文", "Q3_实际参与环节": "确定或缩小研究问题", "Q7_最近任务AI使用": "使用过"}
+        with self.assertRaisesRegex(ValueError, "Q1非是路径"):
             transform_survey_export([row])
 
     def test_rating_merge_flags_missing_duplicate_invalid_and_unscorable(self):
@@ -72,7 +78,6 @@ class SyntheticImportTests(unittest.TestCase):
             "method_fit": "2",
             "limitation_boundary": "NOT_SCORABLE",
             "independent_decision": "NOT_SCORABLE",
-            "reasoning_quality": "NOT_SCORABLE",
         }
         with tempfile.TemporaryDirectory() as temporary:
             task_path = Path(temporary) / "task.csv"

@@ -1,27 +1,27 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Phase 1F模拟短任务结构",
+  "title": "Phase 1H.1五维模拟短任务结构",
   "type": "object",
-  "required": ["research_id", "synthetic_flag", "synthetic_version", "task_status", "analysis_eligible", "ai_used_in_task", "final_decision_owner", "problem_definition", "information_evaluation", "method_fit", "limitation_boundary", "independent_decision", "reasoning_quality"],
+  "additionalProperties": false,
+  "required": ["research_id", "synthetic_flag", "synthetic_version", "task_status", "analysis_eligible", "ai_used_in_task", "final_decision_owner", "problem_definition", "information_evaluation", "method_fit", "limitation_boundary", "independent_decision"],
   "properties": {
     "research_id": {"type": "string", "nullable": false, "description_zh": "问卷样本中的去标识化研究编号", "synthetic_only": true},
     "synthetic_flag": {"type": "string", "nullable": false, "enum": ["TRUE"], "allowed_values": ["TRUE"], "description_zh": "模拟记录标志", "synthetic_only": true},
-    "synthetic_version": {"type": "string", "nullable": false, "enum": ["phase1f_validation_v1"], "allowed_values": ["phase1f_validation_v1"], "description_zh": "流程模拟版本标记，不是研究版本", "synthetic_only": true},
+    "synthetic_version": {"type": "string", "nullable": false, "enum": ["phase1h1_five_dimension_v1"], "allowed_values": ["phase1h1_five_dimension_v1"], "description_zh": "流程模拟版本标记，不是研究版本", "synthetic_only": true},
     "task_status": {"type": "string", "nullable": false, "enum": ["COMPLETE", "PARTIAL", "ABORTED"], "allowed_values": ["COMPLETE", "PARTIAL", "ABORTED"], "description_zh": "任务完成状态；ABORTED无可评分维度，PARTIAL仅部分维度可评分", "synthetic_only": true},
-    "analysis_eligible": {"type": "string", "nullable": false, "enum": ["TRUE", "FALSE"], "allowed_values": ["TRUE", "FALSE"], "description_zh": "派生分析资格；仅COMPLETE可进入完整六维表现分析", "synthetic_only": true},
+    "analysis_eligible": {"type": "string", "nullable": false, "enum": ["TRUE", "FALSE"], "allowed_values": ["TRUE", "FALSE"], "description_zh": "派生分析资格；仅COMPLETE可进入完整五维表现分析", "synthetic_only": true},
     "ai_used_in_task": {"type": "string", "nullable": false, "enum": ["YES", "NO"], "allowed_values": ["YES", "NO"], "description_zh": "任务中的AI使用事实", "synthetic_only": true},
     "ai_stage": {"type": "string", "nullable": false, "description_zh": "AI使用环节；非使用者结构性跳题", "synthetic_only": true},
     "asked_reason": {"type": "string", "nullable": false, "description_zh": "追问AI理由或条件；仅实际AI使用者适用", "synthetic_only": true},
     "checked_evidence": {"type": "string", "nullable": false, "description_zh": "是否检查AI依据；仅实际AI使用者适用", "synthetic_only": true},
     "modified_ai": {"type": "string", "nullable": false, "description_zh": "是否修改AI建议；仅实际AI使用者适用", "synthetic_only": true},
     "rejected_ai": {"type": "string", "nullable": false, "description_zh": "是否拒绝AI建议；仅实际AI使用者适用", "synthetic_only": true},
-    "final_decision_owner": {"type": "string", "nullable": false, "enum": ["STUDENT", "STUDENT_AFTER_AI_INPUT", "UNCLEAR"], "allowed_values": ["STUDENT", "STUDENT_AFTER_AI_INPUT", "UNCLEAR"], "description_zh": "决策归属；未使用AI者不得取STUDENT_AFTER_AI_INPUT", "synthetic_only": true},
-    "research_experience_group": {"type": "string", "nullable": false, "description_zh": "研究经历类别，仅作分组描述", "synthetic_only": true},
+    "final_decision_owner": {"type": "string", "nullable": false, "enum": ["STUDENT", "STUDENT_AFTER_AI_INPUT", "UNCLEAR", "NOT_REACHED"], "allowed_values": ["STUDENT", "STUDENT_AFTER_AI_INPUT", "UNCLEAR", "NOT_REACHED"], "description_zh": "决策归属；ABORTED未到达最终方案时必须为NOT_REACHED", "synthetic_only": true},
+    "recent_task_type": {"type": "string", "nullable": false, "description_zh": "关联问卷Q2的最近任务类型；模拟分组字段，不代表入组资格", "synthetic_only": true},
     "problem_definition": {"oneOf": [{"type": "integer", "minimum": 0, "maximum": 2}, {"const": "NOT_SCORABLE"}], "nullable": false, "allowed_values": [0, 1, 2, "NOT_SCORABLE"], "description_zh": "问题界定分项；0是有可评作答但未呈现行为，NOT_SCORABLE表示无足够答案", "synthetic_only": true},
     "information_evaluation": {"oneOf": [{"type": "integer", "minimum": 0, "maximum": 2}, {"const": "NOT_SCORABLE"}], "nullable": false, "allowed_values": [0, 1, 2, "NOT_SCORABLE"], "description_zh": "信息辨识与评估分项；0与不可评分缺失严格区分", "synthetic_only": true},
     "method_fit": {"oneOf": [{"type": "integer", "minimum": 0, "maximum": 2}, {"const": "NOT_SCORABLE"}], "nullable": false, "allowed_values": [0, 1, 2, "NOT_SCORABLE"], "description_zh": "方法适配分项；0与不可评分缺失严格区分", "synthetic_only": true},
     "limitation_boundary": {"oneOf": [{"type": "integer", "minimum": 0, "maximum": 2}, {"const": "NOT_SCORABLE"}], "nullable": false, "allowed_values": [0, 1, 2, "NOT_SCORABLE"], "description_zh": "限制与结论边界分项；0与不可评分缺失严格区分", "synthetic_only": true},
-    "independent_decision": {"oneOf": [{"type": "integer", "minimum": 0, "maximum": 2}, {"const": "NOT_SCORABLE"}], "nullable": false, "allowed_values": [0, 1, 2, "NOT_SCORABLE"], "description_zh": "独立研究决策分项；0与不可评分缺失严格区分", "synthetic_only": true},
-    "reasoning_quality": {"oneOf": [{"type": "integer", "minimum": 0, "maximum": 2}, {"const": "NOT_SCORABLE"}], "nullable": false, "allowed_values": [0, 1, 2, "NOT_SCORABLE"], "description_zh": "理由质量分项；0与不可评分缺失严格区分", "synthetic_only": true}
+    "independent_decision": {"oneOf": [{"type": "integer", "minimum": 0, "maximum": 2}, {"const": "NOT_SCORABLE"}], "nullable": false, "allowed_values": [0, 1, 2, "NOT_SCORABLE"], "description_zh": "独立研究决策分项；0与不可评分缺失严格区分", "synthetic_only": true}
   }
 }

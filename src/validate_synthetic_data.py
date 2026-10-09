@@ -7,13 +7,14 @@ import re
 from collections import Counter
 from pathlib import Path
 
-from src.generate_synthetic_data import AI_FIELDS, DIMENSIONS, SURVEY_RECALL_FIELDS, TASK_AI_FIELDS
+from src.generate_synthetic_data import AI_FIELDS, DIMENSIONS, SURVEY_RECALL_FIELDS, SYNTHETIC_VERSION, TASK_AI_FIELDS
 
 SURVEY_STAGE_FIELDS = ("ai_stage_problem", "ai_stage_information", "ai_stage_method", "ai_stage_limitation")
 SURVEY_DETAIL_FIELDS = ("ai_reason_check", "ai_gave_sources", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance", "method_choice_occurred")
 AI_RECALL_SKIP = ("ai_reason_check", "ai_gave_sources", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance", "method_choice_occurred")
 NA_VALUES = {"NA_SKIP", "NA_APPL", "NA_DK", "NA_MISS", "NA_REFUSE"}
-SYNTHETIC_VERSION = "phase1f_validation_v1"
+QUESTIONNAIRE_Q1_STATES = {"YES", "NO", "UNSURE", "NA_REFUSE"}
+QUESTIONNAIRE_Q7_STATES = {"YES", "NO", "UNSURE", "NO_TOOL", "NA_APPL", "NA_REFUSE"}
 
 
 def load_bundle(directory: Path = Path("data/synthetic")) -> dict[str, list[dict]]:
@@ -35,16 +36,26 @@ def strict_skip_violation_count(bundle: dict) -> int:
     """按问卷候选跳题树计数，不把未展示题目的未知当作合法缺失。"""
     count = 0
     for row in bundle["survey"]:
-        if row["recent_research_task"] == "NO":
+        recent = row.get("recent_research_task")
+        if recent not in QUESTIONNAIRE_Q1_STATES:
+            count += 1
+        if recent != "YES":
             count += sum(row.get(field) != "NA_SKIP" for field in SURVEY_RECALL_FIELDS)
             continue
-        if row["ai_used"] == "NO":
-            count += sum(row.get(field) != "NOT_USED" for field in SURVEY_STAGE_FIELDS)
+        if row.get("recent_task_type") not in {"COURSE_RESEARCH", "COURSE_SURVEY_REPORT", "INNOVATION_PROJECT", "COMPETITION_RESEARCH", "MENTOR_PROJECT", "OTHER_RESEARCH_TASK"}:
+            count += 1
+        participation = row.get("task_participation_stages", "")
+        if not participation or participation == "NA_SKIP":
+            count += 1
+        if row.get("guidance_context") == "NA_SKIP":
+            count += 1
+        ai_used = row.get("ai_used")
+        if ai_used not in QUESTIONNAIRE_Q7_STATES:
+            count += 1
+        if ai_used != "YES":
+            count += sum(row.get(field) != "NA_SKIP" for field in SURVEY_STAGE_FIELDS)
             count += sum(row.get(field) != "NA_SKIP" for field in AI_RECALL_SKIP)
-        elif row["ai_used"] == "UNSURE":
-            count += sum(row.get(field) != "NA_DK" for field in SURVEY_STAGE_FIELDS)
-            count += sum(row.get(field) != "NA_SKIP" for field in AI_RECALL_SKIP)
-        elif row["ai_used"] == "YES":
+        else:
             count += sum(row.get(field) in {"NA_SKIP", "NA_APPL"} for field in SURVEY_STAGE_FIELDS)
             count += sum(row.get(field) == "NA_SKIP" for field in SURVEY_DETAIL_FIELDS)
             if row["ai_gave_sources"] == "NO" and row["ai_evidence_check"] != "NO_RELEVANT_OUTPUT":
@@ -53,12 +64,6 @@ def strict_skip_violation_count(bundle: dict) -> int:
                 count += 1
             if row["method_choice_occurred"] in {"NA_DK", "NA_MISS"} and row["ai_method_compare"] not in {"NA_DK", "NA_MISS"}:
                 count += 1
-        else:
-            count += 1
-        if row["research_experience_type"] == "NONE" and row["research_experience_depth"] != "NA_SKIP":
-            count += 1
-        if row["research_experience_type"] != "NONE" and row["research_experience_depth"] == "NA_SKIP":
-            count += 1
     return count
 
 
@@ -105,6 +110,8 @@ def validate_bundle(bundle: dict) -> list[str]:
     task_by_id = {row["research_id"]: row for row in task}
     status_values = {"COMPLETE", "PARTIAL", "ABORTED"}
     for row in task:
+        if "reasoning_quality" in row:
+            errors.append("旧版reasoning_quality不属于当前五维评分字段")
         status = row.get("task_status")
         scoreable = [_scoreable(row.get(dimension)) for dimension in DIMENSIONS]
         if status not in status_values:
@@ -118,6 +125,8 @@ def validate_bundle(bundle: dict) -> list[str]:
             errors.append("PARTIAL任务须同时有可评分和不可评分维度")
         if status == "ABORTED" and any(scoreable):
             errors.append("ABORTED任务不应有有效评分")
+        if status == "ABORTED" and row.get("final_decision_owner") != "NOT_REACHED":
+            errors.append("ABORTED任务不得虚构最终决策归属，应记NOT_REACHED")
         for dimension, valid in zip(DIMENSIONS, scoreable, strict=True):
             value = row.get(dimension)
             if not valid and value != "NOT_SCORABLE":
@@ -133,7 +142,7 @@ def validate_bundle(bundle: dict) -> list[str]:
             errors.append("任务AI使用状态无效")
         if row["ai_used_in_task"] == "NO" and any(row.get(field) != "NA_SKIP" for field in TASK_AI_FIELDS):
             errors.append("任务未使用AI者的AI过程字段未结构性跳题")
-        if row["final_decision_owner"] not in {"STUDENT", "STUDENT_AFTER_AI_INPUT", "UNCLEAR"}:
+        if row["final_decision_owner"] not in {"STUDENT", "STUDENT_AFTER_AI_INPUT", "UNCLEAR", "NOT_REACHED"}:
             errors.append("最终决策归属类别无效")
 
     if strict_skip_violation_count(bundle):

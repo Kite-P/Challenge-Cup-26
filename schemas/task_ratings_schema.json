@@ -1,15 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Phase 1F模拟短任务评分长表",
+  "title": "Phase 1H.1五维模拟短任务评分长表",
   "type": "object",
   "required": ["research_id", "rater_id", "dimension", "score", "rating_status", "synthetic_version", "synthetic_flag"],
   "properties": {
     "research_id": {"type": "string", "nullable": false, "description_zh": "任务样本编号", "synthetic_only": true},
     "rater_id": {"type": "string", "nullable": false, "enum": ["R1", "R2"], "allowed_values": ["R1", "R2"], "description_zh": "模拟评分者编号", "synthetic_only": true},
-    "dimension": {"type": "string", "nullable": false, "enum": ["problem_definition", "information_evaluation", "method_fit", "limitation_boundary", "independent_decision", "reasoning_quality"], "allowed_values": ["problem_definition", "information_evaluation", "method_fit", "limitation_boundary", "independent_decision", "reasoning_quality"], "description_zh": "实际存在作答且可评分的六个维度之一", "synthetic_only": true},
+    "dimension": {"type": "string", "nullable": false, "enum": ["problem_definition", "information_evaluation", "method_fit", "limitation_boundary", "independent_decision"], "allowed_values": ["problem_definition", "information_evaluation", "method_fit", "limitation_boundary", "independent_decision"], "description_zh": "实际存在作答且可评分的五个维度之一", "synthetic_only": true},
     "score": {"type": "integer", "nullable": false, "minimum": 0, "maximum": 2, "allowed_values": [0, 1, 2], "description_zh": "评分；0表示有可评作答但未呈现该行为，不表示缺失", "synthetic_only": true},
     "rating_status": {"type": "string", "nullable": false, "enum": ["RATED"], "allowed_values": ["RATED"], "description_zh": "该行仅代表实际评分的维度；NOT_SCORABLE不生成评分记录", "synthetic_only": true},
-    "synthetic_version": {"type": "string", "nullable": false, "enum": ["phase1f_validation_v1"], "allowed_values": ["phase1f_validation_v1"], "description_zh": "流程模拟版本标记", "synthetic_only": true},
+    "synthetic_version": {"type": "string", "nullable": false, "enum": ["phase1h1_five_dimension_v1"], "allowed_values": ["phase1h1_five_dimension_v1"], "description_zh": "流程模拟版本标记", "synthetic_only": true},
     "synthetic_flag": {"type": "string", "nullable": false, "enum": ["TRUE"], "allowed_values": ["TRUE"], "description_zh": "模拟记录标志", "synthetic_only": true}
   }
 }

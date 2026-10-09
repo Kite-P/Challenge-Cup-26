@@ -14,7 +14,7 @@ def main() -> int:
     eligible = merged[eligible_flag]
     write(eligible[["research_id", "task_status", "ai_used_in_task", "ai_used", "synthetic_flag_task"]].rename(columns={"synthetic_flag_task": "synthetic_flag"}), "linked_score_eligible_only.csv")
     survey["in_task_subsample"] = survey.research_id.isin(task.research_id)
-    fields = ["year_of_study", "research_experience_type", "ai_used", "school_type"]
+    fields = ["year_of_study", "recent_task_type", "ai_used", "school_type"]
     rows = []
     for field in fields:
         counts = survey.groupby(["in_task_subsample", field], dropna=False).size().reset_index(name="count")

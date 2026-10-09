@@ -1,4 +1,4 @@
-# 模拟分析代码
+# Phase 1H.1 合成流程代码
 
 所有说明、注释和 docstring 使用中文。主流程为可复现的 `.py` 脚本，不以 Notebook 为唯一实现。
 
@@ -7,7 +7,7 @@
 | `generate_synthetic_data.py` | 固定随机种子 | 写入 `data/synthetic/` 五份模拟CSV | 标准库 |
 | `validate_synthetic_data.py` | 五份模拟CSV | 主键、子集、跳题、AI边界和格式扫描 | 标准库 |
 | `analyze_student_survey_synthetic.py` | 模拟问卷 | 问卷分项频数比例表 | pandas |
-| `analyze_task_synthetic.py` | 模拟任务 | 完成情况、AI使用分层、六维描述 | pandas |
+| `analyze_task_synthetic.py` | 模拟任务 | 完成情况、AI使用分层、五维描述 | pandas |
 | `analyze_linked_student_task_synthetic.py` | 问卷与任务 | 关联样本、AI使用者过程、子样本选择比较 | pandas |
 | `analyze_rater_agreement_synthetic.py` | 双评分数据 | 精确一致率、平均绝对差、维度分歧 | pandas |
 | `analyze_enterprise_profile_synthetic.py` | 模拟岗位及标签 | 岗位族、八维画像与交叉描述 | pandas |

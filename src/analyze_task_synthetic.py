@@ -1,4 +1,4 @@
-"""输出任务完成、AI使用分层和六维表现描述。"""
+"""输出任务完成、AI使用分层和五维表现描述。"""
 
 import pandas as pd
 
@@ -15,9 +15,9 @@ def main() -> int:
     eligible[list(DIMENSIONS)] = eligible[list(DIMENSIONS)].astype("int64")
     means = eligible.groupby("ai_used_in_task", dropna=False)[list(DIMENSIONS)].mean().reset_index()
     write(means.melt(id_vars="ai_used_in_task", var_name="dimension", value_name="descriptive_mean"), "task_dimension_means_by_ai_use.csv")
-    exp = eligible.groupby("research_experience_group", dropna=False)[list(DIMENSIONS)].mean().reset_index()
-    write(exp.melt(id_vars="research_experience_group", var_name="dimension", value_name="descriptive_mean"), "task_dimension_means_by_experience.csv")
-    print(f"任务模拟分项描述完成：{len(eligible)}条COMPLETE进入完整六维分析；PARTIAL/ABORTED未纳入均值。")
+    exp = eligible.groupby("recent_task_type", dropna=False)[list(DIMENSIONS)].mean().reset_index()
+    write(exp.melt(id_vars="recent_task_type", var_name="dimension", value_name="descriptive_mean"), "task_dimension_means_by_recent_task_type.csv")
+    print(f"任务模拟分项描述完成：{len(eligible)}条COMPLETE进入完整五维分析；PARTIAL/ABORTED未纳入均值。")
     return 0
 
 

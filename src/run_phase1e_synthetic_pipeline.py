@@ -10,7 +10,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.generate_synthetic_data import build_synthetic_bundle, write_bundle
+from src.generate_synthetic_data import SYNTHETIC_VERSION, build_synthetic_bundle, write_bundle
 from src.validate_synthetic_data import load_bundle, quality_summary, validate_bundle, validate_files
 
 
@@ -44,14 +44,14 @@ def _write_quality_report(bundle: dict, errors: list[str]) -> None:
         "评分": pd.DataFrame(bundle["ratings"]), "岗位": pd.DataFrame(bundle["jobs"]),
         "岗位标签": pd.DataFrame(bundle["labels"]),
     }
-    lines = ["# Phase 1F 模拟数据质量检查报告", "", "**本报告只反映流程模拟数据，不得用于研究结论。**", "",
+    lines = ["# Phase 1H.1 五维模拟数据质量检查报告", "", "**本报告只反映流程模拟数据，不得用于研究结论。**", "",
              "## 文件结构", "", "| 文件 | 行数 | 字段数 |", "|---|---:|---:|"]
     lines.extend(f"| {name} | {len(frame)} | {len(frame.columns)} |" for name, frame in frames.items())
     lines.extend(["", "## 跳题与任务可评分状态", "",
                   f"- 严格跳题违规数：{metrics['strict_skip_violations']}",
                   f"- AI未使用者过程字段违规数：{metrics['ai_nonuser_field_violations']}",
                   f"- COMPLETE：{metrics['complete_count']}", f"- PARTIAL：{metrics['partial_count']}",
-                  f"- ABORTED：{metrics['aborted_count']}", f"- 完整六维分析可用记录：{metrics['analysis_eligible_count']}",
+                  f"- ABORTED：{metrics['aborted_count']}", f"- 完整五维分析可用记录：{metrics['analysis_eligible_count']}",
                   f"- 不可评分维度数：{metrics['unscorable_dimension_count']}", f"- 实际评分长表记录数：{metrics['rating_row_count']}",
                   f"- 任务评分范围异常数：{metrics['score_range_anomalies']}", "",
                   "## 关联与主键", "", f"- 问卷research_id重复数：{metrics['duplicate_research_id_count']}",
@@ -61,11 +61,11 @@ def _write_quality_report(bundle: dict, errors: list[str]) -> None:
                   f"- 实际异常计数：{metrics['anomaly_count']}", f"- Validator错误条数：{len(errors)}",
                   f"- JSON schema 数量：{schema_count}",
                   f"- schema 一致性：{'PASS' if not schema_errors else 'FAIL'}",
-                  f"- 校验版本：`phase1f_validation_v1`（合成流程版本，不是研究版本）",
+                  f"- 校验版本：`{SYNTHETIC_VERSION}`（合成流程版本，不是研究版本）",
                   "- 验证信息：" + ("无异常。" if not errors else "；".join(errors)),
                   "- schema问题：" + ("无。" if not schema_errors else "；".join(schema_errors)),
                   "- 任务表现均值仅使用 `COMPLETE` 且 `analysis_eligible=TRUE` 的记录。",
-                  "- `PARTIAL`未进入默认完整六维均值；`ABORTED`未评分、未进入均值。",
+                  "- `PARTIAL`未进入默认完整五维均值；`ABORTED`未评分、未进入均值，最终方案归属记为`NOT_REACHED`。",
                   "- 0分表示存在可评作答但未呈现该行为；`NOT_SCORABLE`表示没有足够作答，两者不互换。",
                   "- 所有模拟CSV均检查 `synthetic_flag=TRUE`；不设置真实身份映射。", ""])
     output = Path("results/synthetic")
@@ -73,7 +73,7 @@ def _write_quality_report(bundle: dict, errors: list[str]) -> None:
     (output / "data_quality_report.md").write_text("\n".join(lines), encoding="utf-8")
     env = {"python_version": sys.version.split()[0], "pandas_version": version("pandas"),
            "matplotlib_version": version("matplotlib"), "seed": 20261004,
-           "synthetic_version": "phase1f_validation_v1", "pipeline_exit_code": 0 if not errors else 1,
+           "synthetic_version": SYNTHETIC_VERSION, "pipeline_exit_code": 0 if not errors else 1,
            "synthetic_only": True}
     pd.Series(env).to_json(output / "execution_environment.json", force_ascii=False, indent=2)
 
@@ -108,7 +108,7 @@ def main() -> int:
     if errors:
         print("流水线末尾校验失败：" + "；".join(errors))
         return 1
-    print("Phase 1F模拟流水线完成；质量报告指标均由实际记录计算。")
+    print("Phase 1H.1五维合成流水线完成；质量报告指标均由实际记录计算。")
     return 0
 
 

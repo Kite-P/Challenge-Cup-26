@@ -13,7 +13,6 @@ DIMENSIONS = {
     "method_fit",
     "limitation_boundary",
     "independent_decision",
-    "reasoning_quality",
 }
 
 TASK_DIMENSION_COLUMNS = {
@@ -22,7 +21,6 @@ TASK_DIMENSION_COLUMNS = {
     "method_fit",
     "limitation_boundary",
     "independent_decision",
-    "reasoning_quality",
 }
 
 
