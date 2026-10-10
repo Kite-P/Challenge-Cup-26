@@ -10,11 +10,27 @@ from pathlib import Path
 from src.generate_synthetic_data import AI_FIELDS, DIMENSIONS, SURVEY_RECALL_FIELDS, SYNTHETIC_VERSION, TASK_AI_FIELDS
 
 SURVEY_STAGE_FIELDS = ("ai_stage_problem", "ai_stage_information", "ai_stage_method", "ai_stage_limitation")
-SURVEY_DETAIL_FIELDS = ("ai_reason_check", "ai_gave_sources", "ai_output_handling", "ai_disagreement_response", "unverified_acceptance")
-AI_RECALL_SKIP = ("ai_reason_check", "ai_gave_sources", "ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance")
-NA_VALUES = {"NA_SKIP", "NA_APPL", "NA_DK", "NA_MISS", "NA_REFUSE"}
+AI_RECALL_SKIP = ("ai_reason_check", "ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance")
 QUESTIONNAIRE_Q1_STATES = {"YES", "NO", "UNSURE", "NA_REFUSE"}
 QUESTIONNAIRE_Q7_STATES = {"YES", "NO", "UNSURE", "NO_TOOL", "NA_APPL", "NA_REFUSE"}
+Q10_CHECK_STATES = {"YES", "NO", "NO_RELEVANT_OUTPUT", "NA_DK", "NA_REFUSE", "NA_MISS"}
+Q10_OBJECT_OPTIONS = {"SOURCE_EXISTS", "CLAIM_SUPPORT", "DATE_SCOPE", "POPULATION_MEASURE", "DATA_CALCULATION", "CROSS_SOURCE", "OTHER"}
+Q10_METHOD_OPTIONS = {"OPEN_ORIGINAL", "SEARCH_INDEPENDENT", "COMPARE_TEXT", "RECALCULATE", "CONSULT_QUALIFIED_PERSON", "OTHER"}
+Q13_ACTION_OPTIONS = {"OPEN_ORIGINAL", "SEARCH_INDEPENDENT", "COMPARE_SOURCES", "CHECK_DATE", "CHECK_METHOD", "ASK_PERSON"}
+Q13_EXCLUSIVE_OPTIONS = {"NO_SPECIAL_CHECK", "NO_RELATED_EXPERIENCE", "NA_DK", "NA_REFUSE", "NA_MISS"}
+Q14_ACTION_OPTIONS = {"UNDERSTOOD_PURPOSE", "MATCHED_TO_QUESTION", "CONSIDERED_DATA", "CHANGED_OR_REJECTED", "MADE_FINAL_CHOICE", "OTHER"}
+Q14_AI_COMPARE_STATES = {"YES", "NO", "NA_DK", "NA_REFUSE", "NA_MISS"}
+Q3_STAGE_OPTIONS = {"DEFINE_QUESTION", "FIND_OR_EVALUATE_SOURCES", "EVALUATE_INFORMATION", "CHOOSE_OR_MODIFY_METHOD", "COLLECT_OR_ORGANIZE_DATA", "ANALYZE_DATA", "INTERPRET_OR_LIMIT_CONCLUSION", "WRITE_OR_PRESENT", "OTHER"}
+Q6_TRAINING_OPTIONS = {"COURSE", "WORKSHOP", "GUIDED_TASK", "SELF_STUDY"}
+Q4_MAJOR_STATES = {"ECONOMICS", "PUBLIC_FINANCE", "FINANCE_INSURANCE", "STATISTICS_DATA", "ACCOUNTING_AUDIT", "BUSINESS_MANAGEMENT", "TRADE_LOGISTICS", "OTHER_FINANCE_RELATED", "NA_DK", "NA_REFUSE", "NA_MISS"}
+Q5_YEAR_STATES = {"YEAR_1", "YEAR_2", "YEAR_3", "YEAR_4", "NA_REFUSE", "NA_MISS"}
+Q8_STAGE_STATES = {"YES", "NO", "NA_DK", "NA_REFUSE", "NA_MISS"}
+Q9_STATES = {"YES", "NO", "NOT_ENCOUNTERED", "NA_DK", "NA_REFUSE", "NA_MISS"}
+Q11_STATES = {"ACCEPT", "ACCEPT_AFTER_CHECK", "MODIFY", "PARTIAL", "REFERENCE_ONLY", "REJECT", "NOT_ENCOUNTERED", "NA_DK", "NA_REFUSE", "NA_MISS"}
+Q12_STATES = {"COMPARE_BASIS", "ASK_AGAIN", "ASK_PERSON", "ACCEPT_AI", "KEEP_ORIGINAL", "NOT_ENCOUNTERED", "NA_DK", "NA_REFUSE", "NA_MISS"}
+Q15_STATES = {"NEVER", "SOMETIMES", "OFTEN", "NOT_ENCOUNTERED", "NA_DK", "NA_REFUSE", "NA_MISS"}
+Q18_STATES = {"CHECK_DEFINITION", "SEEK_OTHER_EVIDENCE", "DIRECT_EFFECT_CLAIM", "GENERALIZE_TO_ALL", "NA_DK", "NA_REFUSE", "NA_MISS"}
+Q20_STATES = {"1", "2", "3", "4", "5", "NA_DK", "NA_REFUSE", "NA_MISS"}
 
 
 def load_bundle(directory: Path = Path("data/synthetic")) -> dict[str, list[dict]]:
@@ -32,6 +48,18 @@ def _scoreable(value: object) -> bool:
     return str(value) in {"0", "1", "2"}
 
 
+def _valid_multiselect(value: object, options: set[str], exclusive: set[str]) -> bool:
+    """检查去重多选或单独的互斥状态码。"""
+    if not isinstance(value, str) or not value:
+        return False
+    selected = value.split("|")
+    if len(selected) != len(set(selected)):
+        return False
+    if len(selected) == 1 and selected[0] in exclusive:
+        return True
+    return bool(selected) and not (set(selected) & exclusive) and set(selected) <= options and all(selected)
+
+
 def strict_skip_violation_count(bundle: dict) -> int:
     """按问卷候选跳题树计数，不把未展示题目的未知当作合法缺失。"""
     count = 0
@@ -39,20 +67,37 @@ def strict_skip_violation_count(bundle: dict) -> int:
         recent = row.get("recent_research_task")
         if recent not in QUESTIONNAIRE_Q1_STATES:
             count += 1
+        if not _valid_multiselect(row.get("info_source_check_actions"), Q13_ACTION_OPTIONS, Q13_EXCLUSIVE_OPTIONS):
+            count += 1
+        training_items = str(row.get("training_need", "")).split("|")
+        training_specials = {"NO_ADDITIONAL_NEED", "NA_DK", "NA_REFUSE", "NA_MISS"}
+        training_options = {"RESEARCH_QUESTION", "SOURCE_EVALUATION", "AI_CHECKING", "METHOD_SELECTION", "SURVEY_SAMPLING", "DATA_ANALYSIS", "LIMITATION_INTERPRETATION", "ACADEMIC_INTEGRITY", "MENTOR_FEEDBACK"}
+        if len(training_items) > 3 or not _valid_multiselect(row.get("training_need"), training_options, training_specials):
+            count += 1
+        if not _valid_multiselect(row.get("method_training"), Q6_TRAINING_OPTIONS, {"NONE", "NA_DK", "NA_REFUSE", "NA_MISS"}):
+            count += 1
+        if row.get("policy_awareness") not in {"RULES_CLEAR_BOUNDARIES", "RULES_UNSPECIFIC", "INCONSISTENT", "NOT_HEARD", "NA_DK", "NA_REFUSE", "NA_MISS"}:
+            count += 1
+        if row.get("major_group") not in Q4_MAJOR_STATES:
+            count += 1
+        if row.get("year_of_study") not in Q5_YEAR_STATES:
+            count += 1
+        if row.get("info_confidence_optional") not in Q20_STATES:
+            count += 1
+        if row.get("a9_first_action") not in Q18_STATES:
+            count += 1
+        open_concern = row.get("open_concern")
+        if open_concern not in {"NO_RELATED_VIEW", "NA_DK", "NA_REFUSE", "NA_MISS"} and not (isinstance(open_concern, str) and open_concern.startswith("模拟回答：")):
+            count += 1
         if recent != "YES":
             count += sum(row.get(field) != "NA_SKIP" for field in SURVEY_RECALL_FIELDS)
             continue
         if row.get("recent_task_type") not in {"COURSE_RESEARCH", "COURSE_SURVEY_REPORT", "INNOVATION_PROJECT", "COMPETITION_RESEARCH", "MENTOR_PROJECT", "OTHER_RESEARCH_TASK", "NA_DK", "NA_REFUSE", "NA_MISS"}:
             count += 1
         participation = row.get("task_participation_stages", "")
-        if not participation or participation == "NA_SKIP":
+        if not _valid_multiselect(participation, Q3_STAGE_OPTIONS, {"NA_DK", "NA_REFUSE", "NA_MISS"}):
             count += 1
         if row.get("guidance_context") == "NA_SKIP":
-            count += 1
-        if row.get("training_need") in {None, "NA_SKIP"}:
-            count += 1
-        training_items = str(row.get("training_need", "")).split("|")
-        if len(training_items) > 3 or len(training_items) != len(set(training_items)) or (len(training_items) > 1 and set(training_items) & {"NO_ADDITIONAL_NEED", "NA_DK", "NA_REFUSE"}):
             count += 1
         ai_used = row.get("ai_used")
         if ai_used not in QUESTIONNAIRE_Q7_STATES:
@@ -61,28 +106,32 @@ def strict_skip_violation_count(bundle: dict) -> int:
             count += sum(row.get(field) != "NA_SKIP" for field in SURVEY_STAGE_FIELDS)
             count += sum(row.get(field) != "NA_SKIP" for field in AI_RECALL_SKIP if field != "method_choice_occurred")
         else:
-            count += sum(row.get(field) in {"NA_SKIP", "NA_APPL"} for field in SURVEY_STAGE_FIELDS)
-            count += sum(row.get(field) == "NA_SKIP" for field in SURVEY_DETAIL_FIELDS)
-            if row["method_choice_occurred"] == "NO" and row["ai_method_compare"] != "NO_METHOD_CHOICE":
-                count += 1
-            if row["method_choice_occurred"] == "YES" and row["ai_method_compare"] == "NA_SKIP":
-                count += 1
-            if row["method_choice_occurred"] in {"NA_DK", "NA_MISS"} and row["ai_method_compare"] != "NA_SKIP":
-                count += 1
+            count += sum(row.get(field) not in Q8_STAGE_STATES for field in SURVEY_STAGE_FIELDS)
+            count += int(row.get("ai_reason_check") not in Q9_STATES)
+            count += int(row.get("ai_output_handling") not in Q11_STATES)
+            count += int(row.get("ai_disagreement_response") not in Q12_STATES)
+            count += int(row.get("unverified_acceptance") not in Q15_STATES)
         checked = row.get("ai_evidence_checked")
         if ai_used != "YES":
             count += sum(row.get(field) != "NA_SKIP" for field in ("ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods"))
-        elif checked not in {"YES", "NO", "NO_RELEVANT_OUTPUT", "NA_DK", "NA_MISS"}:
+        elif checked not in Q10_CHECK_STATES:
             count += 1
-        elif checked == "YES" and any(not row.get(field) or row.get(field) in NA_VALUES for field in ("ai_evidence_objects", "ai_evidence_methods")):
+        elif checked == "YES":
+            count += sum(not _valid_multiselect(row.get(field), options, {"NA_DK", "NA_REFUSE", "NA_MISS"}) for field, options in (("ai_evidence_objects", Q10_OBJECT_OPTIONS), ("ai_evidence_methods", Q10_METHOD_OPTIONS)))
+        else:
+            count += sum(row.get(field) != "NA_SKIP" for field in ("ai_evidence_objects", "ai_evidence_methods"))
+
+        method_choice = row.get("method_choice_occurred")
+        valid_method_choice_states = {"YES", "NO", "NA_DK", "NA_REFUSE", "NA_MISS"}
+        if method_choice not in valid_method_choice_states:
             count += 1
-        elif checked != "YES" and any(row.get(field) != "NA_SKIP" for field in ("ai_evidence_objects", "ai_evidence_methods")):
+        if method_choice == "YES":
+            count += int(not _valid_multiselect(row.get("method_decision_actions"), Q14_ACTION_OPTIONS, {"NA_DK", "NA_REFUSE", "NA_MISS"}))
+        elif row.get("method_decision_actions") != "NA_SKIP":
             count += 1
-        if row.get("method_choice_occurred") == "YES" and row.get("method_decision_actions") in {None, "NA_SKIP"}:
-            count += 1
-        elif row.get("method_choice_occurred") != "YES" and row.get("method_decision_actions") != "NA_SKIP":
-            count += 1
-        if ai_used != "YES" and row.get("ai_method_compare") != "NA_SKIP":
+        if ai_used == "YES":
+            count += int(row.get("ai_method_compare") not in Q14_AI_COMPARE_STATES)
+        elif row.get("ai_method_compare") != "NA_SKIP":
             count += 1
     return count
 

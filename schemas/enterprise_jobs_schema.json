@@ -6,7 +6,7 @@
   "properties": {
     "stable_job_record_key": {"type": "string", "nullable": false, "description_zh": "模拟稳定岗位记录键；真实组合方式须按未来获准数据确定", "synthetic_only": true},
     "synthetic_flag": {"type": "string", "nullable": false, "enum": ["TRUE"], "allowed_values": ["TRUE"], "description_zh": "模拟记录标志", "synthetic_only": true},
-    "synthetic_version": {"type": "string", "nullable": false, "enum": ["phase2b_v06_contract_v1"], "allowed_values": ["phase2b_v06_contract_v1"], "description_zh": "流程模拟版本标记", "synthetic_only": true},
+    "synthetic_version": {"type": "string", "nullable": false, "enum": ["phase2b_v06_contract_v2"], "allowed_values": ["phase2b_v06_contract_v2"], "description_zh": "流程模拟版本标记", "synthetic_only": true},
     "job_family": {"type": "string", "nullable": false, "description_zh": "模拟岗位族", "synthetic_only": true},
     "synthetic_title": {"type": "string", "nullable": false, "description_zh": "虚构岗位标题", "synthetic_only": true},
     "synthetic_description": {"type": "string", "nullable": false, "description_zh": "模板构造的模拟职责，不含真实企业文本", "synthetic_only": true},

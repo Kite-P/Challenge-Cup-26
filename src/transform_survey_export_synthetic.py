@@ -1,4 +1,4 @@
-"""按问卷v0.5候选跳题合同转换平台中立的虚构导出。"""
+"""按问卷v0.6部分候选字段转换平台中立的虚构导出。"""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Iterable
 
 
-SYNTHETIC_VERSION = "phase2b_v06_contract_v1"
+SYNTHETIC_VERSION = "phase2b_v06_contract_v2"
 REQUIRED_COLUMNS = {
     "平台响应ID",
     "Q1_最近是否参与研究型学习任务",
