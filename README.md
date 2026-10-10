@@ -1,13 +1,27 @@
-# 挑战杯项目（Challenge-Cup-26）
+# 财经相关本科生生成式 AI 研究型学习项目
 
-当前阶段：Phase 1H.1，研究设计一致性修订、五维模拟流程同步、文献引用规范化与导师审阅材料整理；真人研究仍未启动。
+**当前唯一参赛目标：**第十七届全国大学生市场调查与分析大赛本科组自主选题实践赛。
+**当前目标状态：**`MARKET_SURVEY_17` / `UNDERGRADUATE` / `SELF_SELECTED_TOPIC` / `CURRENT_TARGET`。
+**报名状态：**`REGISTRATION_NOT_VERIFIED`（报名未核实）。
+**真人研究门禁：**`PILOT_BLOCKED`（未获准开展真人研究）。
 
-状态：`PILOT_BLOCKED`（暂不允许真人试测）。导师已确认项目参加“大挑”主体赛方向。已找到面向2027年挑战杯的特定学院校内选拔通知；本团队适用性和报名状态未知，全国正式规则仍待核。尚未联系参与者，也未开展试测、问卷、访谈、任务测试或数据收集。
+本项目不再以本届挑战杯为参赛目标，也不准备双赛事材料。旧挑战杯报告、文档、工具和提交全部保留为历史研究资产；本轮未重命名 GitHub 仓库。
 
-数据收集：尚未开始。本阶段未开展或授权问卷、访谈、任务测试及参与者招募。
+## 研究主题
 
-当前候选设计聚焦财经相关专业本科生如何在研究型学习任务中与生成式 AI 协作，以及协作方式与信息辨识与评估、方法理解与适配、独立研究决策及可观察任务表现之间的关系。赛事成果框架按哲学社会科学类社会调查报告准备；往届经·观只作历史参考。学生问卷为拟议的主要证据，短任务与访谈为补充；企业岗位能力需求画像是已确认纳入的补充研究模块，当前招聘数据、来源版本与许可尚未落实（`RECRUITMENT_DATA_NOT_YET_AVAILABLE`），结果状态为 `NOT_ANALYZED`。不预设正向效果或因果关系。
+研究财经相关专业本科生在研究型学习中使用生成式人工智能的行为，关注使用情况与协作环节、信息辨识与评估、方法理解与适配、独立研究决策、任务内可观察表现及科研训练需求。校园数字学习工具与学习资源仅为约10分钟短任务的中性情境，不是消费满意度主题。企业招聘能力需求侧继续作为已确认补充模块；当前未取得招聘数据，不得虚构岗位分析结果。研究不预设 AI 促进能力，也不由横截面关联推出因果。
 
-候选学校包括 Capital University of Economics and Business、Beijing Technology and Business University 和 Central University of Finance and Economics。列为候选不代表获准进入学校或招募参与者。企业端已确认为补充方向，但数据版本、许可和来源仍待确认；当前没有可分析招聘文本。
+## 当前入口
 
-所有候选工具仍未获准分发或实施；短任务 `NOT PILOTED`，总状态 `PILOT_BLOCKED`。Phase 1H 已整理问卷 v0.5、约10分钟任务/评分 v0.5、学生与教师访谈 v0.3、报告 Master Draft v0.1 及导师审阅包；这些均不是批准或试测结果。`data/synthetic/` 与 `results/synthetic/` 仅用于流程测试，不是研究结果。未联系参与者，未开展真人试测、问卷、访谈、任务测试或数据收集。当前周期全国/校内规则仍待核；BTBU/CUFE渠道为 `WAIT_SUPERVISOR_EXTERNAL_CONFIRMATION`；招聘数据为 `RECRUITMENT_DATA_NOT_YET_AVAILABLE`。详见 [`docs/review/当前活跃研究设计索引.md`](docs/review/当前活跃研究设计索引.md)、[`docs/review/当前项目状态_单页.md`](docs/review/当前项目状态_单页.md)、[`docs/review/Phase1H_导师审阅包.md`](docs/review/Phase1H_导师审阅包.md)、[`docs/phase1/54_phase1h_gate.md`](docs/phase1/54_phase1h_gate.md)、[`docs/review/待人工确认事项_不催问版.md`](docs/review/待人工确认事项_不催问版.md) 和 [`docs/phase1/12_blueprint_v0_3_candidate.md`](docs/phase1/12_blueprint_v0_3_candidate.md)。未来用于研究生申请的正式实证论文属于独立项目，详见 [`docs/PROJECT_BOUNDARIES.md`](docs/PROJECT_BOUNDARIES.md)。
+- [当前项目状态（单页）](docs/review/当前项目状态_单页.md)
+- [当前活跃研究设计索引](docs/review/当前活跃研究设计索引.md)
+- [赛事转向与目标定位](docs/competition/18_Phase2A赛事转向与目标定位.md)
+- [大挑成果复用与市调适配矩阵](docs/competition/19_大挑成果复用与市调适配矩阵.md)
+- [市调导向研究方案 v0.1](docs/phase2/01_市调导向研究方案_v0_1.md)
+- [现有工具适配审查与修改建议](docs/phase2/02_现有工具适配审查与修改建议.md)
+- [第十七届市调大赛报告 Master v0.1](docs/report/第十七届市调大赛_报告Master_v0_1.md)
+- [项目交接导航](docs/HANDOVER.md)
+
+问卷 v0.5、短任务/评分 v0.5、学生/教师访谈 v0.3 均仍是候选稿。本轮不修改工具正文、不开展真人测试或调查、不联系学校/导师/参与者/企业，不购买或获取企业数据。全国赛事节点与本校通知须分别核实；校内代码、截止、缴费及第十七届 AI 规范仍待确认。详见赛事转向说明。
+
+`data/synthetic/` 与 `results/synthetic/` 仅为软件流程验证，不是真人或企业证据。未来正式实证论文仍是独立项目，边界见 [项目范围](docs/PROJECT_BOUNDARIES.md)。
