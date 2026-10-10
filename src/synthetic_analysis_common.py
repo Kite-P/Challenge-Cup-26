@@ -29,3 +29,13 @@ def count_table(frame: pd.DataFrame, column: str, output_name: str, label: str |
     result["proportion"] = result["count"] / max(len(frame), 1)
     write(result, output_name)
     return result
+
+
+def multi_select_count_table(frame: pd.DataFrame, column: str, output_name: str, label: str | None = None) -> pd.DataFrame:
+    """将竖线分隔的模拟多选按选项展开，比例分母为全部回答记录数。"""
+    choices = frame[column].fillna("").astype(str).str.split("|").explode()
+    choices = choices[~choices.isin({"", "NA_SKIP", "NA_APPL", "NA_DK", "NA_MISS", "NA_REFUSE"})]
+    result = choices.value_counts().rename_axis(label or column).reset_index(name="count")
+    result["proportion_respondents"] = result["count"] / max(len(frame), 1)
+    write(result, output_name)
+    return result

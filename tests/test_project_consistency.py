@@ -7,7 +7,9 @@ from src.check_project_consistency import ACTIVE_DOCS, scan_text, scan_tracked_p
 
 class ProjectConsistencyTests(unittest.TestCase):
     def test_active_document_scan_targets_current_questionnaire_candidate(self):
-        self.assertIn("docs/phase1/instruments/05_questionnaire_v0_5_supervisor_review.md", ACTIVE_DOCS)
+        self.assertIn("docs/phase1/instruments/05_questionnaire_v0_6_supervisor_review.md", ACTIVE_DOCS)
+        self.assertIn("docs/phase2/01_市调导向研究方案_v0_2.md", ACTIVE_DOCS)
+        self.assertIn("docs/report/第十七届市调大赛_报告Master_v0_2.md", ACTIVE_DOCS)
         self.assertNotIn("docs/phase1/instruments/05_questionnaire_v0_4_review_ready.md", ACTIVE_DOCS)
 
     def test_active_document_scan_targets_phase1h_instrument_candidates(self):

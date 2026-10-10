@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Iterable
 
 
-SYNTHETIC_VERSION = "phase1h1_five_dimension_v1"
+SYNTHETIC_VERSION = "phase2b_v06_contract_v1"
 REQUIRED_COLUMNS = {
     "平台响应ID",
     "Q1_最近是否参与研究型学习任务",
@@ -34,7 +34,7 @@ TASK_TYPES = {
     "课程研究作业/课程论文": "COURSE_RESEARCH",
     "课程调查或研究报告": "COURSE_SURVEY_REPORT",
     "大学生创新训练项目": "INNOVATION_PROJECT",
-    "挑战杯或其他学术科技竞赛中的研究任务": "COMPETITION_RESEARCH",
+    "学术科技竞赛中的研究任务（不指定具体赛事）": "COMPETITION_RESEARCH",
     "导师课题/科研助理任务": "MENTOR_PROJECT",
     "其他研究型学习任务": "OTHER_RESEARCH_TASK",
 }

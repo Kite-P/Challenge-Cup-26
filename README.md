@@ -17,11 +17,14 @@
 - [当前活跃研究设计索引](docs/review/当前活跃研究设计索引.md)
 - [赛事转向与目标定位](docs/competition/18_Phase2A赛事转向与目标定位.md)
 - [大挑成果复用与市调适配矩阵](docs/competition/19_大挑成果复用与市调适配矩阵.md)
-- [市调导向研究方案 v0.1](docs/phase2/01_市调导向研究方案_v0_1.md)
-- [现有工具适配审查与修改建议](docs/phase2/02_现有工具适配审查与修改建议.md)
-- [第十七届市调大赛报告 Master v0.1](docs/report/第十七届市调大赛_报告Master_v0_1.md)
+- [市调导向研究方案 v0.2](docs/phase2/01_市调导向研究方案_v0_2.md)
+- [问卷 v0.6 候选](docs/phase1/instruments/05_questionnaire_v0_6_supervisor_review.md)
+- [工具适配审阅 v0.2](docs/phase2/02_市调工具审阅与修订记录_v0_2.md)
+- [第十七届市调大赛报告 Master v0.2](docs/report/第十七届市调大赛_报告Master_v0_2.md)
+- [一等奖报告逐页方法审阅](docs/competition/20_国一等奖报告逐页方法审阅.md)
+- [Phase 2B 导师审阅包](docs/review/Phase2B_导师审阅包.md)
 - [项目交接导航](docs/HANDOVER.md)
 
-问卷 v0.5、短任务/评分 v0.5、学生/教师访谈 v0.3 均仍是候选稿。本轮不修改工具正文、不开展真人测试或调查、不联系学校/导师/参与者/企业，不购买或获取企业数据。全国赛事节点与本校通知须分别核实；校内代码、截止、缴费及第十七届 AI 规范仍待确认。详见赛事转向说明。
+问卷 v0.6、短任务/评分 v0.5、学生/教师访谈 v0.3 均为导师审阅候选稿。赛事报名/知识赛与真人研究门禁独立；`PILOT_BLOCKED`只限制真人研究，报名仍为`REGISTRATION_NOT_VERIFIED`。本轮未联系第三方、未开展真人测试或调查，未获取企业数据。校内报名及第十七届AI规则仍待核实。详见赛事转向说明。
 
 `data/synthetic/` 与 `results/synthetic/` 仅为软件流程验证，不是真人或企业证据。未来正式实证论文仍是独立项目，边界见 [项目范围](docs/PROJECT_BOUNDARIES.md)。

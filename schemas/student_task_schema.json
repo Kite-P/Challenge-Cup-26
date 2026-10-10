@@ -7,7 +7,7 @@
   "properties": {
     "research_id": {"type": "string", "nullable": false, "description_zh": "问卷样本中的去标识化研究编号", "synthetic_only": true},
     "synthetic_flag": {"type": "string", "nullable": false, "enum": ["TRUE"], "allowed_values": ["TRUE"], "description_zh": "模拟记录标志", "synthetic_only": true},
-    "synthetic_version": {"type": "string", "nullable": false, "enum": ["phase1h1_five_dimension_v1"], "allowed_values": ["phase1h1_five_dimension_v1"], "description_zh": "流程模拟版本标记，不是研究版本", "synthetic_only": true},
+    "synthetic_version": {"type": "string", "nullable": false, "enum": ["phase2b_v06_contract_v1"], "allowed_values": ["phase2b_v06_contract_v1"], "description_zh": "流程模拟版本标记，不是研究版本", "synthetic_only": true},
     "task_status": {"type": "string", "nullable": false, "enum": ["COMPLETE", "PARTIAL", "ABORTED"], "allowed_values": ["COMPLETE", "PARTIAL", "ABORTED"], "description_zh": "任务完成状态；ABORTED无可评分维度，PARTIAL仅部分维度可评分", "synthetic_only": true},
     "analysis_eligible": {"type": "string", "nullable": false, "enum": ["TRUE", "FALSE"], "allowed_values": ["TRUE", "FALSE"], "description_zh": "派生分析资格；仅COMPLETE可进入完整五维表现分析", "synthetic_only": true},
     "ai_used_in_task": {"type": "string", "nullable": false, "enum": ["YES", "NO"], "allowed_values": ["YES", "NO"], "description_zh": "任务中的AI使用事实", "synthetic_only": true},

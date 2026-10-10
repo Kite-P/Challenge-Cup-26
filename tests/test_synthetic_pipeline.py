@@ -47,7 +47,7 @@ class SyntheticPipelineTests(unittest.TestCase):
             if key != "dimensions":
                 self.assertTrue(all(row.get("synthetic_flag") == "TRUE" for row in rows))
                 if rows:
-                    self.assertTrue(all(row.get("synthetic_version") == "phase1h1_five_dimension_v1" for row in rows))
+                    self.assertTrue(all(row.get("synthetic_version") == "phase2b_v06_contract_v1" for row in rows))
 
     def test_active_task_dimensions_are_exactly_five(self):
         self.assertEqual(DIMENSIONS, ("problem_definition", "information_evaluation", "method_fit", "limitation_boundary", "independent_decision"))
@@ -76,8 +76,52 @@ class SyntheticPipelineTests(unittest.TestCase):
         self.assertTrue({"NA_DK", "NA_REFUSE"} <= q2_states)
 
     def test_q13_no_experience_is_distinct_from_unknown(self):
-        q13_states = {row["info_source_check"] for row in self.bundle["survey"]}
+        q13_states = {row["info_source_check_actions"] for row in self.bundle["survey"]}
         self.assertTrue({"NO_RELATED_EXPERIENCE", "NA_DK", "NA_REFUSE"} <= q13_states)
+
+    def test_q10_separates_check_status_objects_and_methods(self):
+        rows = self.bundle["survey"]
+        self.assertTrue(any(row["ai_evidence_checked"] == "YES" for row in rows))
+        self.assertTrue(any(row["ai_evidence_checked"] == "NO" for row in rows))
+        object_codes = {"SOURCE_EXISTS", "CLAIM_SUPPORT", "DATE_SCOPE", "POPULATION_MEASURE", "DATA_CALCULATION", "CROSS_SOURCE"}
+        method_codes = {"OPEN_ORIGINAL", "SEARCH_INDEPENDENT", "COMPARE_TEXT", "RECALCULATE", "CONSULT_QUALIFIED_PERSON"}
+        for row in rows:
+            objects, methods = row["ai_evidence_objects"], row["ai_evidence_methods"]
+            if row["ai_evidence_checked"] == "YES":
+                self.assertTrue(set(objects.split("|")) <= object_codes)
+                self.assertTrue(set(methods.split("|")) <= method_codes)
+                self.assertNotIn("NA_SKIP", (objects, methods))
+            else:
+                self.assertEqual((objects, methods), ("NA_SKIP", "NA_SKIP"))
+
+    def test_q13_supports_multiple_information_check_actions(self):
+        rows = self.bundle["survey"]
+        self.assertTrue(any("|" in row["info_source_check_actions"] for row in rows))
+        self.assertTrue(any(row["info_source_check_actions"] == "NO_RELATED_EXPERIENCE" for row in rows))
+
+    def test_q14_distinguishes_personal_method_actions_from_ai_comparison(self):
+        rows = self.bundle["survey"]
+        self.assertTrue(any(row["method_choice_occurred"] == "YES" and row["ai_used"] == "NO" for row in rows))
+        self.assertTrue(any(row["method_choice_occurred"] == "YES" and row["ai_used"] == "YES" for row in rows))
+        for row in rows:
+            if row["method_choice_occurred"] == "YES":
+                self.assertNotEqual(row["method_decision_actions"], "NA_SKIP")
+            else:
+                self.assertEqual(row["method_decision_actions"], "NA_SKIP")
+            if row["ai_used"] != "YES" or row["method_choice_occurred"] in {"NA_DK", "NA_MISS", "NA_SKIP"}:
+                self.assertEqual(row["ai_method_compare"], "NA_SKIP")
+            elif row["method_choice_occurred"] == "NO":
+                self.assertEqual(row["ai_method_compare"], "NO_METHOD_CHOICE")
+
+    def test_q16_training_need_is_separate_and_not_skipped_without_recent_task(self):
+        rows = self.bundle["survey"]
+        self.assertTrue(any(row["recent_research_task"] == "NO" and row["training_need"] != "NA_SKIP" for row in rows))
+        self.assertTrue(any("|" in row["training_need"] for row in rows))
+        self.assertTrue(any(row["training_need"] == "NO_ADDITIONAL_NEED" for row in rows))
+
+    def test_no_recent_research_task_does_not_remove_respondent_from_candidate_sample(self):
+        self.assertEqual(len(self.bundle["survey"]), 240)
+        self.assertTrue(any(row["recent_research_task"] == "NO" for row in self.bundle["survey"]))
 
     def test_validator_rejects_q7_answer_when_q1_skips_it(self):
         changed = deepcopy(self.bundle)
@@ -85,20 +129,34 @@ class SyntheticPipelineTests(unittest.TestCase):
         row["ai_used"] = "YES"
         self.assertTrue(any("Q1" in error or "跳题" in error for error in validate_bundle(changed)))
 
-    def test_questionnaire_has_28_fields(self):
-        self.assertEqual(len(self.bundle["survey"][0]), 28)
+    def test_questionnaire_contract_has_expected_fields(self):
+        self.assertTrue({"ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods", "method_decision_actions", "training_need", "info_source_check_actions"} <= set(self.bundle["survey"][0]))
 
-    def test_survey_analyzer_uses_v05_task_fields(self):
+    def test_survey_analyzer_uses_current_questionnaire_fields(self):
         import pandas as pd
         from src import analyze_student_survey_synthetic as analyzer
 
         frame = pd.DataFrame(self.bundle["survey"])
-        with patch.object(analyzer, "read", return_value=frame), patch.object(analyzer, "count_table") as count:
+        with patch.object(analyzer, "read", return_value=frame), patch.object(analyzer, "count_table") as count, patch.object(analyzer, "multi_select_count_table") as multi_count:
             analyzer.main()
         fields = {call.args[1] for call in count.call_args_list}
         self.assertIn("recent_task_type", fields)
-        self.assertIn("task_participation_stages", fields)
+        multi_fields = {call.args[1] for call in multi_count.call_args_list}
+        self.assertIn("task_participation_stages", multi_fields)
+        self.assertIn("info_source_check_actions", multi_fields)
         self.assertNotIn("research_experience_type", fields)
+
+    def test_multi_select_summary_counts_each_selected_option(self):
+        import pandas as pd
+        from src.synthetic_analysis_common import multi_select_count_table
+
+        frame = pd.DataFrame({"choices": ["A|B", "B", "NA_SKIP"]})
+        with patch("src.synthetic_analysis_common.write") as write:
+            result = multi_select_count_table(frame, "choices", "unused.csv")
+        counts = dict(zip(result["choices"], result["count"], strict=True))
+        self.assertEqual(counts, {"B": 2, "A": 1})
+        self.assertEqual(dict(zip(result["choices"], result["proportion_respondents"], strict=True))["B"], 2 / 3)
+        write.assert_called_once()
 
     def test_quality_summary_counts_complete_tasks_only_as_analysis_eligible(self):
         metrics = quality_summary(self.bundle)
@@ -113,7 +171,7 @@ class SyntheticPipelineTests(unittest.TestCase):
     def test_nonusers_have_no_effective_ai_process_answers(self):
         for row in self.bundle["survey"]:
             if row["ai_used"] != "YES":
-                for field in ("ai_reason_check", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance"):
+                for field in ("ai_reason_check", "ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance"):
                     self.assertIn(row[field], {"NA_SKIP", "NA_APPL", "NA_DK", "NA_MISS", "NOT_USED", "NO_RELEVANT_OUTPUT", "NOT_ENCOUNTERED"})
 
     def test_validator_returns_no_errors_for_generated_bundle(self):
@@ -121,7 +179,7 @@ class SyntheticPipelineTests(unittest.TestCase):
 
     def test_survey_contains_required_synthetic_fields(self):
         fields = set(self.bundle["survey"][0])
-        self.assertTrue({"ai_stage_problem", "ai_reason_check", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "info_source_check", "a9_first_action", "recent_task_type", "task_participation_stages", "method_training", "major_group", "year_of_study", "school_type", "guidance_context", "unverified_acceptance", "info_confidence_optional"} <= fields)
+        self.assertTrue({"ai_stage_problem", "ai_reason_check", "ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "info_source_check_actions", "method_decision_actions", "training_need", "a9_first_action", "recent_task_type", "task_participation_stages", "method_training", "major_group", "year_of_study", "school_type", "guidance_context", "unverified_acceptance", "info_confidence_optional"} <= fields)
 
     def test_missing_codes_are_distinguished(self):
         codes = {value for row in self.bundle["survey"] for value in row.values()}
@@ -187,24 +245,26 @@ class SyntheticPipelineTests(unittest.TestCase):
         self.assertEqual(set(task["required"]) & set(DIMENSIONS), set(DIMENSIONS))
         self.assertNotIn("reasoning_quality", task["properties"])
         self.assertNotIn("reasoning_quality", ratings["properties"]["dimension"]["enum"])
-        self.assertEqual(task["properties"]["synthetic_version"]["enum"], ["phase1h1_five_dimension_v1"])
+        self.assertEqual(task["properties"]["synthetic_version"]["enum"], ["phase2b_v06_contract_v1"])
 
     def test_no_recent_task_skips_all_task_recall_items(self):
-        fields = ("ai_used", "ai_stage_problem", "ai_stage_information", "ai_stage_method", "ai_stage_limitation", "ai_reason_check", "ai_gave_sources", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "method_choice_occurred", "ai_method_compare", "unverified_acceptance")
+        fields = ("ai_used", "ai_stage_problem", "ai_stage_information", "ai_stage_method", "ai_stage_limitation", "ai_reason_check", "ai_gave_sources", "ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods", "ai_output_handling", "ai_disagreement_response", "method_choice_occurred", "method_decision_actions", "ai_method_compare", "unverified_acceptance")
         row = next(row for row in self.bundle["survey"] if row["recent_research_task"] == "NO")
         self.assertTrue(all(row[field] == "NA_SKIP" for field in fields))
 
     def test_ai_non_yes_routes_skip_q8_to_q12_and_q14_to_q15(self):
         row = next(row for row in self.bundle["survey"] if row["ai_used"] == "NO")
-        self.assertTrue(all(row[field] == "NA_SKIP" for field in ("ai_stage_problem", "ai_stage_information", "ai_stage_method", "ai_stage_limitation", "ai_reason_check", "ai_gave_sources", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance", "method_choice_occurred")))
+        self.assertTrue(all(row[field] == "NA_SKIP" for field in ("ai_stage_problem", "ai_stage_information", "ai_stage_method", "ai_stage_limitation", "ai_reason_check", "ai_gave_sources", "ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance")))
 
     def test_ai_unsure_skips_interaction_recall_items(self):
         row = next(row for row in self.bundle["survey"] if row["ai_used"] == "UNSURE")
-        self.assertTrue(all(row[field] == "NA_SKIP" for field in ("ai_stage_problem", "ai_stage_information", "ai_stage_method", "ai_stage_limitation", "ai_reason_check", "ai_gave_sources", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance", "method_choice_occurred")))
+        self.assertTrue(all(row[field] == "NA_SKIP" for field in ("ai_stage_problem", "ai_stage_information", "ai_stage_method", "ai_stage_limitation", "ai_reason_check", "ai_gave_sources", "ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance")))
 
-    def test_no_sources_uses_displayed_no_relevant_output_option(self):
-        row = next(row for row in self.bundle["survey"] if row["ai_gave_sources"] == "NO")
-        self.assertEqual(row["ai_evidence_check"], "NO_RELEVANT_OUTPUT")
+    def test_q10_no_relevant_output_is_distinct_from_not_checked(self):
+        row = next(row for row in self.bundle["survey"] if row["ai_evidence_checked"] == "NO_RELEVANT_OUTPUT")
+        self.assertEqual(row["ai_evidence_checked"], "NO_RELEVANT_OUTPUT")
+        self.assertEqual(row["ai_evidence_objects"], "NA_SKIP")
+        self.assertEqual(row["ai_evidence_methods"], "NA_SKIP")
 
     def test_no_method_choice_uses_displayed_non_applicable_option(self):
         row = next(row for row in self.bundle["survey"] if row["method_choice_occurred"] == "NO" and row["ai_used"] == "YES")

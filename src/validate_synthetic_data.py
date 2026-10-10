@@ -10,8 +10,8 @@ from pathlib import Path
 from src.generate_synthetic_data import AI_FIELDS, DIMENSIONS, SURVEY_RECALL_FIELDS, SYNTHETIC_VERSION, TASK_AI_FIELDS
 
 SURVEY_STAGE_FIELDS = ("ai_stage_problem", "ai_stage_information", "ai_stage_method", "ai_stage_limitation")
-SURVEY_DETAIL_FIELDS = ("ai_reason_check", "ai_gave_sources", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance", "method_choice_occurred")
-AI_RECALL_SKIP = ("ai_reason_check", "ai_gave_sources", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance", "method_choice_occurred")
+SURVEY_DETAIL_FIELDS = ("ai_reason_check", "ai_gave_sources", "ai_output_handling", "ai_disagreement_response", "unverified_acceptance")
+AI_RECALL_SKIP = ("ai_reason_check", "ai_gave_sources", "ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance")
 NA_VALUES = {"NA_SKIP", "NA_APPL", "NA_DK", "NA_MISS", "NA_REFUSE"}
 QUESTIONNAIRE_Q1_STATES = {"YES", "NO", "UNSURE", "NA_REFUSE"}
 QUESTIONNAIRE_Q7_STATES = {"YES", "NO", "UNSURE", "NO_TOOL", "NA_APPL", "NA_REFUSE"}
@@ -49,21 +49,41 @@ def strict_skip_violation_count(bundle: dict) -> int:
             count += 1
         if row.get("guidance_context") == "NA_SKIP":
             count += 1
+        if row.get("training_need") in {None, "NA_SKIP"}:
+            count += 1
+        training_items = str(row.get("training_need", "")).split("|")
+        if len(training_items) > 3 or len(training_items) != len(set(training_items)) or (len(training_items) > 1 and set(training_items) & {"NO_ADDITIONAL_NEED", "NA_DK", "NA_REFUSE"}):
+            count += 1
         ai_used = row.get("ai_used")
         if ai_used not in QUESTIONNAIRE_Q7_STATES:
             count += 1
         if ai_used != "YES":
             count += sum(row.get(field) != "NA_SKIP" for field in SURVEY_STAGE_FIELDS)
-            count += sum(row.get(field) != "NA_SKIP" for field in AI_RECALL_SKIP)
+            count += sum(row.get(field) != "NA_SKIP" for field in AI_RECALL_SKIP if field != "method_choice_occurred")
         else:
             count += sum(row.get(field) in {"NA_SKIP", "NA_APPL"} for field in SURVEY_STAGE_FIELDS)
             count += sum(row.get(field) == "NA_SKIP" for field in SURVEY_DETAIL_FIELDS)
-            if row["ai_gave_sources"] == "NO" and row["ai_evidence_check"] != "NO_RELEVANT_OUTPUT":
-                count += 1
             if row["method_choice_occurred"] == "NO" and row["ai_method_compare"] != "NO_METHOD_CHOICE":
                 count += 1
-            if row["method_choice_occurred"] in {"NA_DK", "NA_MISS"} and row["ai_method_compare"] not in {"NA_DK", "NA_MISS"}:
+            if row["method_choice_occurred"] == "YES" and row["ai_method_compare"] == "NA_SKIP":
                 count += 1
+            if row["method_choice_occurred"] in {"NA_DK", "NA_MISS"} and row["ai_method_compare"] != "NA_SKIP":
+                count += 1
+        checked = row.get("ai_evidence_checked")
+        if ai_used != "YES":
+            count += sum(row.get(field) != "NA_SKIP" for field in ("ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods"))
+        elif checked not in {"YES", "NO", "NO_RELEVANT_OUTPUT", "NA_DK", "NA_MISS"}:
+            count += 1
+        elif checked == "YES" and any(not row.get(field) or row.get(field) in NA_VALUES for field in ("ai_evidence_objects", "ai_evidence_methods")):
+            count += 1
+        elif checked != "YES" and any(row.get(field) != "NA_SKIP" for field in ("ai_evidence_objects", "ai_evidence_methods")):
+            count += 1
+        if row.get("method_choice_occurred") == "YES" and row.get("method_decision_actions") in {None, "NA_SKIP"}:
+            count += 1
+        elif row.get("method_choice_occurred") != "YES" and row.get("method_decision_actions") != "NA_SKIP":
+            count += 1
+        if ai_used != "YES" and row.get("ai_method_compare") != "NA_SKIP":
+            count += 1
     return count
 
 

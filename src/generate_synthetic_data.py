@@ -8,10 +8,10 @@ import random
 from pathlib import Path
 
 DIMENSIONS = ("problem_definition", "information_evaluation", "method_fit", "limitation_boundary", "independent_decision")
-SYNTHETIC_VERSION = "phase1h1_five_dimension_v1"
-AI_FIELDS = ("ai_reason_check", "ai_gave_sources", "ai_evidence_check", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance")
+SYNTHETIC_VERSION = "phase2b_v06_contract_v1"
+AI_FIELDS = ("ai_reason_check", "ai_gave_sources", "ai_evidence_checked", "ai_evidence_objects", "ai_evidence_methods", "ai_output_handling", "ai_disagreement_response", "ai_method_compare", "unverified_acceptance")
 NA_CODES = ("NA_SKIP", "NA_APPL", "NA_DK", "NA_MISS", "NA_REFUSE")
-SURVEY_RECALL_FIELDS = ("ai_used", "ai_stage_problem", "ai_stage_information", "ai_stage_method", "ai_stage_limitation", *AI_FIELDS, "method_choice_occurred", "recent_task_type", "task_participation_stages", "guidance_context")
+SURVEY_RECALL_FIELDS = ("ai_used", "ai_stage_problem", "ai_stage_information", "ai_stage_method", "ai_stage_limitation", *AI_FIELDS, "method_choice_occurred", "method_decision_actions", "recent_task_type", "task_participation_stages", "guidance_context")
 TASK_AI_FIELDS = ("ai_stage", "asked_reason", "checked_evidence", "modified_ai", "rejected_ai")
 
 
@@ -28,8 +28,12 @@ def build_synthetic_bundle(seed: int = 20261004, n_survey: int = 240, n_task: in
         task_type = rng.choice([*task_types, "NA_DK", "NA_REFUSE", "NA_MISS"]) if has_task else "NA_SKIP"
         participation = "|".join(rng.sample(participation_stages, rng.randint(1, 3))) if has_task else "NA_SKIP"
         ai_used = ("YES", "NO", "UNSURE", "NO_TOOL", "NA_APPL", "NA_REFUSE")[(i // 4) % 6] if has_task else "NA_SKIP"
-        method_choice = rng.choice(["YES", "NO", "NA_DK", "NA_MISS"]) if has_task and ai_used == "YES" else "NA_SKIP"
-        gave_sources = rng.choice(["YES", "NO", "NA_DK"]) if ai_used == "YES" else "NA_SKIP"
+        method_choice = ("YES", "NO", "NA_DK", "NA_MISS")[(i // 24) % 4] if has_task else "NA_SKIP"
+        gave_sources = ("NO" if (i // 24) % 4 == 3 else "YES") if ai_used == "YES" else "NA_SKIP"
+        evidence_checked = ("YES", "NO", "NO_RELEVANT_OUTPUT", "NA_DK", "NA_MISS")[(i // 24) % 5] if ai_used == "YES" else "NA_SKIP"
+        evidence_objects = "|".join(rng.sample(["SOURCE_EXISTS", "CLAIM_SUPPORT", "DATE_SCOPE", "POPULATION_MEASURE", "DATA_CALCULATION", "CROSS_SOURCE"], rng.randint(1, 2))) if evidence_checked == "YES" else "NA_SKIP"
+        evidence_methods = "|".join(rng.sample(["OPEN_ORIGINAL", "SEARCH_INDEPENDENT", "COMPARE_TEXT", "RECALCULATE", "CONSULT_QUALIFIED_PERSON"], rng.randint(1, 2))) if evidence_checked == "YES" else "NA_SKIP"
+        training_need = rng.choice(["NO_ADDITIONAL_NEED", "NA_DK", "NA_REFUSE"]) if i % 13 == 0 else "|".join(rng.sample(["RESEARCH_QUESTION", "SOURCE_EVALUATION", "AI_CHECKING", "METHOD_SELECTION", "SURVEY_SAMPLING", "DATA_ANALYSIS", "LIMITATION_INTERPRETATION", "ACADEMIC_INTEGRITY", "MENTOR_FEEDBACK"], rng.randint(1, 3)))
         def ai_answer(options: list[str]) -> str:
             if ai_used == "YES":
                 return rng.choice(options)
@@ -47,21 +51,25 @@ def build_synthetic_bundle(seed: int = 20261004, n_survey: int = 240, n_task: in
             "ai_stage_method": stages[2], "ai_stage_limitation": stages[3],
             "ai_reason_check": rng.choice(["YES", "NO", "NA_DK", "NA_MISS"]) if details_shown else "NA_SKIP",
             "ai_gave_sources": gave_sources,
-            "ai_evidence_check": rng.choice(["CHECK_EXISTENCE", "CHECK_SUPPORT", "COMPARE_SOURCE", "NO_CHECK", "NA_DK", "NA_MISS"]) if gave_sources == "YES" else "NO_RELEVANT_OUTPUT" if gave_sources == "NO" else "NA_DK" if gave_sources == "NA_DK" else "NA_SKIP",
+            "ai_evidence_checked": evidence_checked,
+            "ai_evidence_objects": evidence_objects,
+            "ai_evidence_methods": evidence_methods,
             "ai_output_handling": rng.choice(["ACCEPT", "MODIFY", "PARTIAL", "REJECT", "NOT_ENCOUNTERED", "NA_DK", "NA_MISS"]) if details_shown else "NA_SKIP",
             "ai_disagreement_response": rng.choice(["COMPARE_BASIS", "ASK_AGAIN", "KEEP_VIEW", "ACCEPT", "NOT_ENCOUNTERED", "NA_DK", "NA_MISS"]) if details_shown else "NA_SKIP",
-            "method_choice_occurred": method_choice if details_shown else "NA_SKIP",
-            "ai_method_compare": rng.choice(["YES", "NO", "NA_DK", "NA_MISS"]) if details_shown and method_choice == "YES" else "NO_METHOD_CHOICE" if details_shown and method_choice == "NO" else method_choice if details_shown else "NA_SKIP",
-            "info_source_check": rng.choice(["SOURCE", "DATE", "SAMPLE", "MEASURE", "SUPPORT", "NO_RELATED_EXPERIENCE", "NA_DK", "NA_REFUSE", "NA_MISS"]),
+            "method_choice_occurred": method_choice,
+            "method_decision_actions": "|".join(rng.sample(["UNDERSTOOD_PURPOSE", "MATCHED_TO_QUESTION", "CONSIDERED_DATA", "CHANGED_OR_REJECTED", "MADE_FINAL_CHOICE"], rng.randint(1, 3))) if method_choice == "YES" else "NA_SKIP",
+            "ai_method_compare": rng.choice(["YES", "NO", "NA_DK", "NA_MISS"]) if details_shown and method_choice == "YES" else "NO_METHOD_CHOICE" if details_shown and method_choice == "NO" else "NA_SKIP",
+            "info_source_check_actions": "|".join(rng.sample(["OPEN_ORIGINAL", "SEARCH_INDEPENDENT", "COMPARE_SOURCES", "CHECK_DATE", "CHECK_METHOD", "ASK_PERSON"], rng.randint(1, 3))) if i % 11 < 8 else rng.choice(["NO_RELATED_EXPERIENCE", "NA_DK", "NA_REFUSE", "NA_MISS"]),
             "a9_first_action": rng.choice(["CHECK_DEFINITION", "CHECK_COVERAGE", "SEEK_OTHER_EVIDENCE", "WITHHOLD_INFERENCE", "NA_MISS"]),
             "a9_reason": rng.choice(["核对指标口径", "比较可支持的结论", "补充其他材料", "NA_MISS"]),
             "recent_task_type": task_type,
             "task_participation_stages": participation,
             "method_training": rng.choice(["COURSE", "WORKSHOP", "SELF_STUDY", "NONE", "NA_DK"]),
-            "major_group": rng.choice(["ECONOMICS", "MANAGEMENT", "FINANCE", "OTHER_BUSINESS"]),
+            "major_group": rng.choice(["ECONOMICS", "PUBLIC_FINANCE", "FINANCE_INSURANCE", "STATISTICS_DATA", "ACCOUNTING_AUDIT", "BUSINESS_MANAGEMENT", "TRADE_LOGISTICS", "OTHER_FINANCE_RELATED", "NA_DK", "NA_REFUSE"]),
             "year_of_study": rng.choice(["YEAR_1", "YEAR_2", "YEAR_3", "YEAR_4"]),
             "school_type": rng.choice(["FINANCE_SPECIALIZED", "OTHER_WITH_RELATED_MAJOR", "NA_REFUSE"]),
             "guidance_context": rng.choice(["TEACHER", "COURSE", "PEER", "NONE", "NA_DK"]) if has_task else "NA_SKIP",
+            "training_need": training_need,
             "unverified_acceptance": ai_answer(["NEVER", "SOMETIMES", "OFTEN", "NA_DK"]),
             "info_confidence_optional": rng.choice(["1", "2", "3", "4", "5", "NA_DK", "NA_APPL"]),
         })

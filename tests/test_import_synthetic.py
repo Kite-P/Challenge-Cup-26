@@ -50,6 +50,15 @@ class SyntheticImportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "未登记列"):
             transform_survey_export([row])
 
+    def test_q2_uses_generic_competition_wording_without_challenge_cup_label(self):
+        row = {"平台响应ID": "MOCK-2", "Q1_最近是否参与研究型学习任务": "是", "Q2_最近任务类型": "学术科技竞赛中的研究任务（不指定具体赛事）", "Q3_实际参与环节": "确定或缩小研究问题", "Q7_最近任务AI使用": "没有使用"}
+        result = transform_survey_export([row])
+        self.assertEqual(result[0]["recent_task_type"], "COMPETITION_RESEARCH")
+        row["平台响应ID"] = "MOCK-3"
+        row["Q2_最近任务类型"] = "挑战杯或其他学术科技竞赛中的研究任务"
+        with self.assertRaisesRegex(ValueError, "未知选项"):
+            transform_survey_export([row])
+
     def test_questionnaire_rejects_task_answers_when_q1_skips_them(self):
         row = {"平台响应ID": "MOCK-1", "Q1_最近是否参与研究型学习任务": "否", "Q2_最近任务类型": "课程研究作业/课程论文", "Q3_实际参与环节": "确定或缩小研究问题", "Q7_最近任务AI使用": "使用过"}
         with self.assertRaisesRegex(ValueError, "Q1非是路径"):

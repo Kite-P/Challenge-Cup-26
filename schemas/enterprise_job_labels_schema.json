@@ -6,7 +6,7 @@
   "properties": {
     "stable_job_record_key": {"type": "string", "nullable": false, "description_zh": "关联模拟岗位键", "synthetic_only": true},
     "synthetic_flag": {"type": "string", "nullable": false, "enum": ["TRUE"], "allowed_values": ["TRUE"], "description_zh": "模拟记录标志", "synthetic_only": true},
-    "synthetic_version": {"type": "string", "nullable": false, "enum": ["phase1h1_five_dimension_v1"], "allowed_values": ["phase1h1_five_dimension_v1"], "description_zh": "流程模拟版本标记", "synthetic_only": true},
+    "synthetic_version": {"type": "string", "nullable": false, "enum": ["phase2b_v06_contract_v1"], "allowed_values": ["phase2b_v06_contract_v1"], "description_zh": "流程模拟版本标记", "synthetic_only": true},
     "dimension": {"type": "string", "nullable": false, "description_zh": "八个候选画像维度之一", "synthetic_only": true},
     "label": {"type": "integer", "nullable": false, "enum": [0, 1], "allowed_values": [0, 1], "description_zh": "人工生成的模拟二元标签", "synthetic_only": true},
     "label_source": {"type": "string", "nullable": false, "enum": ["SIMULATED_GROUND_TRUTH"], "allowed_values": ["SIMULATED_GROUND_TRUTH"], "description_zh": "仅模拟生成器内部标签，不是真实人工标注", "synthetic_only": true}
