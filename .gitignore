@@ -7,6 +7,7 @@ results/synthetic/*
 !results/synthetic/**
 logs/
 exports/mentor_review_phase1h1/
+exports/mentor_review_phase2c/
 .venv/
 __pycache__/
 .pytest_cache/
